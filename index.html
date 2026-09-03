@@ -2,15 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Meu Universo 0.6.2</title>
 <style>
 :root{--fundo:#fffdfd;--branco:#fff;--texto:#211d21;--texto-suave:#766f75;--rosa:#d96b91;--rosa-claro:#fcf1f5;--linha:#e8e0e5;--escuro:#171519}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--fundo);color:var(--texto);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif} button,input,textarea,select{font:inherit} button{cursor:pointer}
-.app{min-height:100vh;padding-bottom:90px}
-header{position:sticky;top:0;z-index:20;background:rgba(255,253,253,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--linha);padding:14px 17px}
+.app{min-height:100vh;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+header{position:sticky;top:0;z-index:20;background:rgba(255,253,253,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--linha);padding:calc(14px + env(safe-area-inset-top,0px)) 17px 14px 17px}
 .topo{max-width:760px;margin:auto;display:flex;align-items:center;gap:10px}
 .simbolo-lua{width:40px;height:40px;border:1px solid
 var(--texto);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px}
@@ -93,17 +93,17 @@ input:checked+label{background:var(--rosa-claro);color:#984a67;border-color:#e8b
 .tag button{border:0;background:transparent;color:inherit;padding:0 0 0 4px}
 .acoes-formulario{display:flex;gap:7px;margin-top:18px}
 .acoes-formulario .btn{flex:1}
-nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(255,253,253,.97);backdrop-filter:blur(12px);border-top:1px solid var(--linha);padding:7px}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(255,253,253,.97);backdrop-filter:blur(12px);border-top:1px solid var(--linha);padding:7px 7px calc(7px + env(safe-area-inset-bottom,0px)) 7px}
 .nav-interna{max-width:760px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap: 5px}
 .nav-interna
 button{border:0;background:transparent;color:var(--texto-suave);border-radius:12px;padding:6px;font-size:10px}
 .nav-interna button.ativo{background:var(--rosa-claro);color:#b94f75;font-weight:700}
 .nav-icone{display:block;font-size:19px;margin-bottom:2px}
-.fab{position:fixed;right:17px;bottom:77px;z-index:25;width:51px;height:51px;border:0;border-radius:50%;background:var(--rosa);color:white;font-size:24px;box-shadow:0 7px 18px rgba(100,50,70,.16)}
+.fab{position:fixed;right:17px;bottom:calc(77px + env(safe-area-inset-bottom,0px));z-index:25;width:51px;height:51px;border:0;border-radius:50%;background:var(--rosa);color:white;font-size:24px;box-shadow:0 7px 18px rgba(100,50,70,.16)}
 .fab.escondido{display:none}
-.fab-secundario{position:fixed;right:22px;bottom:140px;z-index:25;width:42px;height:42px;border:0;border-radius:50%;background:var(--escuro);color:white;font-size:19px;box-shadow:0 6px 14px rgba(23,21,25,.2)}
+.fab-secundario{position:fixed;right:22px;bottom:calc(140px + env(safe-area-inset-bottom,0px));z-index:25;width:42px;height:42px;border:0;border-radius:50%;background:var(--escuro);color:white;font-size:19px;box-shadow:0 6px 14px rgba(23,21,25,.2)}
 .fab-secundario.escondido{display:none}
-.toast{position:fixed;left:50%;bottom:88px;transform:translate(-50%,20px);opacity:0;background: var(--escuro);color:white;padding:10px 14px;border-radius:12px;font-size:11px;transition:.2s;z-index:50;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background: var(--escuro);color:white;padding:10px 14px;border-radius:12px;font-size:11px;transition:.2s;z-index:50;pointer-events:none}
 .toast.mostrar{opacity:1;transform:translate(-50%,0)}
 .detalhe-cabecalho{margin-bottom:18px}
 .btn-voltar{display:inline-flex;align-items:center;gap:6px;margin-bottom:15px}
