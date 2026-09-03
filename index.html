@@ -10963,6 +10963,7 @@ mostrarTela("planner")
    ========================================================= */
 
 function gerarIdProjeto(){return String(Date.now())+"-"+Math.random().toString(36).slice(2,9)}
+function gerarIdTarefaProjeto(){return String(Date.now())+"-"+Math.random().toString(36).slice(2,9)}
 
 function carregarProjetos(){
 projetos=[];
@@ -10986,6 +10987,12 @@ prioridade:["Baixa","Média","Alta"].includes(projeto.prioridade)?projeto.priori
 prazo:projeto.prazo||"",
 historiaId:projeto.historiaId||"",
 jornadaId:projeto.jornadaId||"",
+tarefas:Array.isArray(projeto.tarefas)?projeto.tarefas.filter(Boolean).map(tarefa=>({
+id:tarefa.id||gerarIdTarefaProjeto(),
+texto:tarefa.texto||"",
+concluida:tarefa.concluida===true,
+criadoEm:Number(tarefa.criadoEm)||Date.now()
+})):[],
 criadoEm:Number(projeto.criadoEm)||Date.now(),
 atualizadoEm:Number(projeto.atualizadoEm)||Date.now()
 }))
@@ -11080,6 +11087,9 @@ ${jornadaVinculada?`
 <div class="texto-progresso">${calcularProgressoJornada(jornadaVinculada)}% concluído</div>
 </div>
 `:""}
+</div>
+${projeto?gerarSecaoTarefasProjeto(projeto):""}
+<div class="formulario-jornada" style="margin-top:10px">
 <div class="acoes-formulario">
 <button class="btn" onclick="cancelarProjeto()">Cancelar</button>
 <button class="btn btn-principal" onclick="salvarProjeto()">Salvar projeto</button>
@@ -11087,6 +11097,84 @@ ${jornadaVinculada?`
 ${projeto?`<button class="btn btn-perigo" style="width:100%;margin-top:8px" onclick='excluirProjeto(${JSON.stringify(projeto.id)})'>Excluir projeto</button>`:""}
 </div>
 `
+}
+
+function gerarSecaoTarefasProjeto(projeto){
+const tarefas=Array.isArray(projeto.tarefas)?projeto.tarefas:[];
+let lista="";
+if(tarefas.length){
+lista=tarefas.map(tarefa=>`
+<div class="linha-meta ${tarefa.concluida?"concluida":""}">
+<input type="checkbox" ${tarefa.concluida?"checked":""} onchange='alternarTarefaProjeto(${JSON.stringify(tarefa.id)})'>
+<span>${escapar(tarefa.texto)}</span>
+<button class="btn btn-perigo" onclick='excluirTarefaProjeto(${JSON.stringify(tarefa.id)})'>Excluir</button>
+</div>
+`).join("")
+}else{
+lista=`
+<div class="card vazio lista-capitulos-vazia">
+<div class="ilustracao" aria-hidden="true">✓</div>
+<h3>Nenhuma tarefa ainda.</h3>
+<p>Adicione a primeira abaixo.</p>
+</div>
+`
+}
+return `
+<div class="detalhe-secao">
+<h2>Tarefas</h2>
+${lista}
+<div class="linha-nova-meta">
+<input id="campoNovaTarefaProjeto" type="text" placeholder="Ex.: Revisar capítulo 1" onkeydown="pressionouEnterTarefaProjeto(event)">
+<button class="btn" onclick="adicionarTarefaProjeto()">＋</button>
+</div>
+</div>
+`
+}
+
+function pressionouEnterTarefaProjeto(event){
+if(event.key==="Enter"){
+event.preventDefault();
+adicionarTarefaProjeto()
+}
+}
+
+function adicionarTarefaProjeto(){
+const projeto=obterProjeto(projetoEditando);
+if(!projeto)return;
+const campo=document.getElementById("campoNovaTarefaProjeto");
+const texto=campo.value.trim();
+if(!texto)return;
+if(!Array.isArray(projeto.tarefas))projeto.tarefas=[];
+projeto.tarefas.push({
+id:gerarIdTarefaProjeto(),
+texto,
+concluida:false,
+criadoEm:Date.now()
+});
+projeto.atualizadoEm=Date.now();
+salvarProjetos();
+renderizarEditorProjeto()
+}
+
+function alternarTarefaProjeto(id){
+const projeto=obterProjeto(projetoEditando);
+if(!projeto||!Array.isArray(projeto.tarefas))return;
+const tarefa=projeto.tarefas.find(item=>String(item.id)===String(id));
+if(!tarefa)return;
+tarefa.concluida=tarefa.concluida!==true;
+projeto.atualizadoEm=Date.now();
+salvarProjetos();
+renderizarEditorProjeto()
+}
+
+function excluirTarefaProjeto(id){
+const projeto=obterProjeto(projetoEditando);
+if(!projeto||!Array.isArray(projeto.tarefas))return;
+if(!confirm("Excluir esta tarefa?"))return;
+projeto.tarefas=projeto.tarefas.filter(item=>String(item.id)!==String(id));
+projeto.atualizadoEm=Date.now();
+salvarProjetos();
+renderizarEditorProjeto()
 }
 
 function salvarProjeto(){
@@ -11179,6 +11267,7 @@ ${jornada?`
 <div class="meta" style="margin-top:4px">🎮 ${escapar(jornada.nome)}</div>
 <div class="barra-progresso" style="margin-top:6px"><div class="barra-progresso-preenchimento" style="width:${calcularProgressoJornada(jornada)}%"></div></div>
 `:""}
+${Array.isArray(projeto.tarefas)&&projeto.tarefas.length?`<div class="meta" style="margin-top:7px">✓ ${projeto.tarefas.filter(t=>t.concluida).length} / ${projeto.tarefas.length} tarefas</div>`:""}
 </button>
 `
 }).join("")
