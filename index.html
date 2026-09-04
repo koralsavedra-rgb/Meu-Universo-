@@ -1705,6 +1705,9 @@ Salvar história
 <section id="editorEventoUniverso" class="tela">
 <div id="conteudoEditorEventoUniverso"></div>
 </section>
+<section id="editorIdeiaUniverso" class="tela">
+<div id="conteudoEditorIdeiaUniverso"></div>
+</section>
 <section id="dentroUniverso" class="tela">
 <div id="conteudoDetalheUniverso"></div>
 </section>
@@ -1969,6 +1972,7 @@ const CHAVE_DADOS_UNIVERSOS="meu_universo_0_4_dados_universos";
 const CHAVE_PERSONAGENS_UNIVERSOS="meu_universo_0_4_personagens_universos";
 const CHAVE_LOCAIS_UNIVERSOS="meu_universo_0_4_locais_universos";
 const CHAVE_EVENTOS_UNIVERSOS="meu_universo_0_4_eventos_universos";
+const CHAVE_IDEIAS_UNIVERSOS="meu_universo_0_4_ideias_universos";
 const CHAVE_JORNADAS="minha_jornada_0_1";
 const CHAVE_XP_GERAL="minha_jornada_0_1_xp";
 const CHAVE_CONQUISTAS="minha_jornada_0_1_conquistas";
@@ -1982,6 +1986,7 @@ CHAVE_DADOS_UNIVERSOS,
 CHAVE_PERSONAGENS_UNIVERSOS,
 CHAVE_LOCAIS_UNIVERSOS,
 CHAVE_EVENTOS_UNIVERSOS,
+CHAVE_IDEIAS_UNIVERSOS,
 CHAVE_JORNADAS,
 CHAVE_XP_GERAL,
 CHAVE_CONQUISTAS,
@@ -2029,6 +2034,9 @@ let locaisUniversos={};
 let localUniversoEditando=null;
 let eventosUniversos={};
 let eventoUniversoEditando=null;
+let ideiasUniversos={};
+let ideiaUniversoEditando=null;
+let filtroIdeiasUniversoAtual="Todas";
 let jornadas=[];
 let jornadaAberta=null;
 let jornadaEditando=null;
@@ -2881,7 +2889,14 @@ year:"numeric"
 }
 )
 }
-function mostrarTela(id){
+function mostrarTela(id,viaHistorico){
+if(!viaHistorico){
+try{
+history.pushState({tela:id},"","#"+id)
+}catch(erro){
+console.error("Erro ao atualizar histórico:",erro)
+}
+}
 document
 .querySelectorAll(".tela")
 .forEach(
@@ -2917,6 +2932,17 @@ if(id==="arquivo")
 renderizarArquivo();
 if(id==="editorEventoUniverso"){
 renderizarEditorEventoUniverso();
+document
+.querySelectorAll(".nav-interna button")
+.forEach(
+b=>b.classList.toggle(
+"ativo",
+b.dataset.tela==="historias"
+)
+)
+}
+if(id==="editorIdeiaUniverso"){
+renderizarEditorIdeiaUniverso();
 document
 .querySelectorAll(".nav-interna button")
 .forEach(
@@ -6981,6 +7007,7 @@ const abas=[
 ["personagens","👤 Personagens"],
 ["locais","📍 Locais"],
 ["cronologia","🕰️ Cronologia"],
+["ideias","💡 Ideias"],
 ["conexoes","🔗 Conexões"]
 ];
 area.innerHTML=`
@@ -7133,6 +7160,11 @@ ${gerarConteudoLocaisUniverso(chave)}
 class="conteudo-aba-detalhe ${abaUniversoAtual==="cronologia"?"ativa":""}"
 >
 ${gerarConteudoCronologiaUniverso(chave)}
+</div>
+<div
+class="conteudo-aba-detalhe ${abaUniversoAtual==="ideias"?"ativa":""}"
+>
+${gerarConteudoIdeiasUniverso(chave)}
 </div>
 <div
 class="conteudo-aba-detalhe ${abaUniversoAtual==="conexoes"?"ativa":""}"
@@ -7918,6 +7950,290 @@ if(!Array.isArray(eventosUniversos[chave])){
 eventosUniversos[chave]=[]
 }
 return eventosUniversos[chave]
+}
+
+/* =========================================================
+   IDEIAS DO UNIVERSO
+   ========================================================= */
+
+function gerarIdIdeiaUniverso(){return String(Date.now())+"-"+Math.random().toString(36).slice(2,9)}
+
+function carregarIdeiasUniversos(){
+ideiasUniversos={};
+try{
+const dados=localStorage.getItem(CHAVE_IDEIAS_UNIVERSOS);
+if(dados){
+const objeto=JSON.parse(dados);
+if(objeto&&typeof objeto==="object"&&!Array.isArray(objeto)){
+ideiasUniversos=objeto
+}
+}
+}catch(erro){
+console.error("Erro ao carregar ideias dos universos:",erro);
+ideiasUniversos={}
+}
+Object.keys(ideiasUniversos).forEach(chave=>{
+if(!Array.isArray(ideiasUniversos[chave])){
+ideiasUniversos[chave]=[]
+}
+ideiasUniversos[chave]=ideiasUniversos[chave].filter(Boolean).map(ideia=>({
+id:ideia.id||gerarIdIdeiaUniverso(),
+texto:typeof ideia.texto==="string"?ideia.texto:"",
+categoria:typeof ideia.categoria==="string"&&ideia.categoria.trim()?ideia.categoria:"Geral",
+criadoEm:Number(ideia.criadoEm)||Date.now(),
+atualizadoEm:Number(ideia.atualizadoEm)||Number(ideia.criadoEm)||Date.now()
+}))
+})
+}
+
+function salvarIdeiasUniversos(){
+try{
+localStorage.setItem(CHAVE_IDEIAS_UNIVERSOS,JSON.stringify(ideiasUniversos))
+}catch(erro){
+console.error("Erro ao salvar ideias dos universos:",erro);
+alert("Não foi possível salvar as ideias deste universo neste navegador.")
+}
+}
+
+function obterIdeiasUniverso(chave){
+if(!Array.isArray(ideiasUniversos[chave])){
+ideiasUniversos[chave]=[]
+}
+return ideiasUniversos[chave]
+}
+
+function gerarConteudoIdeiasUniverso(chave){
+const ideias=obterIdeiasUniverso(chave);
+const categorias=[...new Set(ideias.map(ideia=>ideia.categoria&&ideia.categoria.trim()?ideia.categoria:"Geral"))];
+let categoriasFiltro=categorias;
+if(!categoriasFiltro.length){
+categoriasFiltro=obterCategoriasIdeiaPadrao()
+}
+return `
+<div class="detalhe-secao">
+<div class="cabecalho-ideias">
+<div>
+<h2>Ideias <span class="contador-ideias">${ideias.length}</span></h2>
+</div>
+<button class="btn btn-principal" onclick="novaIdeiaUniverso()">＋ Nova ideia</button>
+</div>
+<input
+id="buscaIdeiasUniverso"
+class="busca"
+type="search"
+placeholder="Procurar por texto da ideia..."
+oninput="filtrarIdeiasUniversoNaTela()"
+autocomplete="off"
+>
+<div class="filtros" id="filtrosIdeiasUniverso">
+<button type="button" class="filtro ${filtroIdeiasUniversoAtual==="Todas"?"ativo":""}" data-filtro-ideia="Todas" onclick="aplicarFiltroIdeiasUniverso('Todas')">Todas</button>
+${categoriasFiltro.map(categoria=>`
+<button type="button" class="filtro ${filtroIdeiasUniversoAtual===categoria?"ativo":""}" data-filtro-ideia="${escapar(categoria)}" onclick='aplicarFiltroIdeiasUniverso(${JSON.stringify(categoria)})'>${escapar(categoria)}</button>
+`).join("")}
+</div>
+<div id="listaIdeiasUniverso">
+${gerarListaIdeiasUniverso(chave,ideias)}
+</div>
+</div>
+`
+}
+
+function gerarListaIdeiasUniverso(chave,ideias){
+if(!ideias.length){
+return `
+<div class="card vazio lista-ideias-vazia">
+<div class="ilustracao" aria-hidden="true">💡</div>
+<h3>Este universo ainda não tem ideias.</h3>
+<p>Guarde aqui pensamentos e possibilidades sobre o mundo, que ainda não têm um lugar definido.</p>
+<button class="btn btn-principal" onclick="novaIdeiaUniverso()">＋ Nova ideia</button>
+</div>
+`
+}
+return ideias.map(ideia=>{
+const texto=ideia.texto&&ideia.texto.trim()?ideia.texto:"Ideia sem texto";
+const categoria=ideia.categoria&&ideia.categoria.trim()?ideia.categoria:"Geral";
+return `
+<button type="button" class="card-ideia" onclick='abrirIdeiaUniverso(${JSON.stringify(chave)},${JSON.stringify(ideia.id)})'>
+<div class="ideia-texto">${escapar(texto)}</div>
+<div class="ideia-categoria"><span class="badge">${escapar(categoria)}</span></div>
+</button>
+`
+}).join("")
+}
+
+function aplicarFiltroIdeiasUniverso(filtro){
+filtroIdeiasUniversoAtual=filtro;
+document.querySelectorAll("[data-filtro-ideia]").forEach(botao=>{
+botao.classList.toggle("ativo",botao.dataset.filtroIdeia===filtro)
+});
+filtrarIdeiasUniversoNaTela()
+}
+
+function filtrarIdeiasUniversoNaTela(){
+const chave=universoAberto;
+if(chave===null)return;
+const lista=document.getElementById("listaIdeiasUniverso");
+if(!lista)return;
+const buscaInput=document.getElementById("buscaIdeiasUniverso");
+const busca=buscaInput?buscaInput.value:"";
+const ideias=obterIdeiasUniverso(chave);
+const filtradas=ideias.filter(ideia=>{
+const correspondeBusca=!normalizarTexto(busca)||normalizarTexto(ideia.texto).includes(normalizarTexto(busca));
+const categoria=ideia.categoria&&ideia.categoria.trim()?ideia.categoria:"Geral";
+const correspondeCategoria=filtroIdeiasUniversoAtual==="Todas"||normalizarTexto(categoria)===normalizarTexto(filtroIdeiasUniversoAtual);
+return correspondeBusca&&correspondeCategoria
+});
+if(!filtradas.length){
+lista.innerHTML=`
+<div class="card vazio">
+<div class="ilustracao" aria-hidden="true">🔎</div>
+<h3>Nenhuma ideia encontrada.</h3>
+<p>Tente procurar por outro texto ou escolher outra categoria.</p>
+</div>
+`;
+return
+}
+lista.innerHTML=gerarListaIdeiasUniverso(chave,filtradas)
+}
+
+function novaIdeiaUniverso(){
+if(universoAberto===null)return;
+ideiaUniversoEditando=null;
+mostrarTela("editorIdeiaUniverso");
+setTimeout(()=>{
+const campo=document.getElementById("campoTextoIdeiaUniverso");
+if(campo)campo.focus()
+},100)
+}
+
+function abrirIdeiaUniverso(chave,idIdeia){
+const ideias=obterIdeiasUniverso(chave);
+const ideia=ideias.find(item=>String(item.id)===String(idIdeia));
+if(!ideia)return;
+universoAberto=chave;
+ideiaUniversoEditando=ideia.id;
+mostrarTela("editorIdeiaUniverso")
+}
+
+function renderizarEditorIdeiaUniverso(){
+const area=document.getElementById("conteudoEditorIdeiaUniverso");
+if(!area)return;
+if(universoAberto===null){
+mostrarTela("universos");
+return
+}
+const chave=universoAberto;
+const ideias=obterIdeiasUniverso(chave);
+const ideia=ideiaUniversoEditando!==null?(ideias.find(item=>String(item.id)===String(ideiaUniversoEditando))||null):null;
+const editando=Boolean(ideia);
+const texto=ideia?.texto||"";
+const categoria=ideia?.categoria&&ideia.categoria.trim()?ideia.categoria:"Geral";
+const categoriasPadrao=obterCategoriasIdeiaPadrao();
+const categoriaEhPadrao=ehCategoriaIdeiaPadrao(categoria);
+const categoriaSelecionada=categoriaEhPadrao?categoria:"PERSONALIZADA";
+area.innerHTML=`
+<div class="editor-ideia-cabecalho">
+<button class="btn btn-voltar" onclick="voltarParaIdeiasUniverso()">← Voltar para ideias</button>
+<h1 class="editor-ideia-titulo">${editando?"Editar ideia":"Nova ideia"}</h1>
+</div>
+<div class="editor-ideia-card">
+<div class="aviso-formulario">
+✦ A ideia é o conteúdo principal desta ficha. Escreva livremente e escolha uma categoria para organizá-la.
+</div>
+<label for="campoTextoIdeiaUniverso">Texto da ideia *</label>
+<textarea id="campoTextoIdeiaUniverso" placeholder="Escreva sua ideia...">${escapar(texto)}</textarea>
+<label for="campoCategoriaIdeiaUniverso">Categoria</label>
+<select id="campoCategoriaIdeiaUniverso" onchange="verificarCategoriaIdeiaUniversoPersonalizada()">
+${categoriasPadrao.map(c=>`<option value="${escapar(c)}" ${categoriaSelecionada===c?"selected":""}>${escapar(c)}</option>`).join("")}
+<option value="PERSONALIZADA" ${categoriaSelecionada==="PERSONALIZADA"?"selected":""}>＋ Criar categoria personalizada</option>
+</select>
+<div id="categoriaIdeiaUniversoPersonalizada" class="categoria-personalizada ${categoriaSelecionada==="PERSONALIZADA"?"mostrar":""}">
+<input id="categoriaIdeiaUniversoPersonalizadaCampo" type="text" value="${categoriaSelecionada==="PERSONALIZADA"?escapar(categoria):""}" placeholder="Escreva sua categoria...">
+</div>
+<div class="ideia-acoes">
+<button class="btn btn-perigo" onclick="excluirIdeiaUniverso()" ${editando?"":'style="display:none"'}>Excluir ideia</button>
+<button class="btn btn-principal" onclick="salvarIdeiaUniverso()">Salvar ideia</button>
+</div>
+<div class="aviso-ficha-ideia">A ideia pertence somente a este universo.</div>
+</div>
+`
+}
+
+function verificarCategoriaIdeiaUniversoPersonalizada(){
+const select=document.getElementById("campoCategoriaIdeiaUniverso");
+const area=document.getElementById("categoriaIdeiaUniversoPersonalizada");
+if(!select||!area)return;
+area.classList.toggle("mostrar",select.value==="PERSONALIZADA");
+if(select.value==="PERSONALIZADA"){
+setTimeout(()=>{
+const campo=document.getElementById("categoriaIdeiaUniversoPersonalizadaCampo");
+if(campo)campo.focus()
+},0)
+}
+}
+
+function salvarIdeiaUniverso(){
+if(universoAberto===null)return;
+const chave=universoAberto;
+const texto=document.getElementById("campoTextoIdeiaUniverso").value.trim();
+if(!texto){
+alert("Escreva o texto da ideia.");
+return
+}
+let categoria=document.getElementById("campoCategoriaIdeiaUniverso").value;
+if(categoria==="PERSONALIZADA"){
+categoria=document.getElementById("categoriaIdeiaUniversoPersonalizadaCampo").value.trim();
+if(!categoria){
+alert("Escreva sua categoria personalizada.");
+return
+}
+}
+const ideias=obterIdeiasUniverso(chave);
+const agora=Date.now();
+if(ideiaUniversoEditando!==null){
+const ideia=ideias.find(item=>String(item.id)===String(ideiaUniversoEditando));
+if(ideia){
+ideia.texto=texto;
+ideia.categoria=categoria;
+ideia.atualizadoEm=agora
+}
+}else{
+ideias.unshift({
+id:gerarIdIdeiaUniverso(),
+texto,
+categoria,
+criadoEm:agora,
+atualizadoEm:agora
+})
+}
+salvarIdeiasUniversos();
+ideiaUniversoEditando=null;
+filtroIdeiasUniversoAtual="Todas";
+abaUniversoAtual="ideias";
+mostrarTela("dentroUniverso");
+mostrarToast("Ideia salva.")
+}
+
+function excluirIdeiaUniverso(){
+if(universoAberto===null)return;
+const chave=universoAberto;
+const ideias=obterIdeiasUniverso(chave);
+const ideia=ideias.find(item=>String(item.id)===String(ideiaUniversoEditando));
+if(!ideia)return;
+if(!confirm("Excluir esta ideia?"))return;
+ideiasUniversos[chave]=ideias.filter(item=>String(item.id)!==String(ideia.id));
+salvarIdeiasUniversos();
+ideiaUniversoEditando=null;
+filtroIdeiasUniversoAtual="Todas";
+abaUniversoAtual="ideias";
+mostrarTela("dentroUniverso");
+mostrarToast("Ideia excluída.")
+}
+
+function voltarParaIdeiasUniverso(){
+ideiaUniversoEditando=null;
+abaUniversoAtual="ideias";
+mostrarTela("dentroUniverso")
 }
 function gerarConteudoCronologiaUniverso(chave){
 const eventos=obterEventosUniverso(chave);
@@ -11529,10 +11845,20 @@ toast.classList.remove(
 1900
 )
 }
+try{
+history.replaceState({tela:"inicio"},"","#inicio")
+}catch(erro){
+console.error("Erro ao iniciar histórico:",erro)
+}
+window.addEventListener("popstate",function(event){
+const tela=(event.state&&event.state.tela)||"inicio";
+mostrarTela(tela,true)
+});
 carregarDadosUniversos();
 carregarPersonagensUniversos();
 carregarLocaisUniversos();
 carregarEventosUniversos();
+carregarIdeiasUniversos();
 carregarJornadas();
 carregarXP();
 carregarConquistas();
