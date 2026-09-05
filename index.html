@@ -1852,6 +1852,27 @@ Restaurar a partir do texto colado
 </button>
 </div>
 
+<div class="card card-clicavel" style="margin-top:10px" onclick="mostrarTela('lixeira')">
+<div class="titulo-historia">🗑️ Lixeira</div>
+<div class="descricao">
+Histórias excluídas ficam aqui até você restaurar ou remover de vez.
+</div>
+</div>
+
+</section>
+
+<section id="lixeira" class="tela">
+
+<button class="btn btn-voltar" onclick="mostrarTela('configuracoes')">← Configurações</button>
+
+<div class="titulo-pagina">🗑️ Lixeira</div>
+
+<p class="texto-intro">
+Histórias excluídas ficam aqui até você decidir restaurar ou remover de vez.
+</p>
+
+<div id="listaLixeira" style="margin-top:15px"></div>
+
 </section>
 
 <section id="editorJornada" class="tela">
@@ -1978,6 +1999,7 @@ const CHAVE_XP_GERAL="minha_jornada_0_1_xp";
 const CHAVE_CONQUISTAS="minha_jornada_0_1_conquistas";
 const CHAVE_PLANNER="meu_planner_0_1";
 const CHAVE_PROJETOS="meu_universo_projetos_0_1";
+const CHAVE_LIXEIRA_HISTORIAS="meu_universo_0_4_lixeira_historias";
 const CHAVES_BACKUP=[
 CHAVE_STORAGE,
 CHAVE_ESTADO_ITENS,
@@ -1991,7 +2013,8 @@ CHAVE_JORNADAS,
 CHAVE_XP_GERAL,
 CHAVE_CONQUISTAS,
 CHAVE_PLANNER,
-CHAVE_PROJETOS
+CHAVE_PROJETOS,
+CHAVE_LIXEIRA_HISTORIAS
 ];
 const CHAVES_ANTIGAS=[
 "meu_universo_0_3_3",
@@ -2050,6 +2073,7 @@ let dataPlannerAtual=new Date().toISOString().slice(0,10);
 let modoPlannerVisualizacao="dia";
 let projetos=[];
 let projetoEditando=null;
+let lixeiraHistorias=[];
 function normalizarTexto(texto){
 return String(texto||"")
 .normalize("NFD")
@@ -2928,6 +2952,8 @@ if(id==="recentes")
 renderizarRecentes();
 if(id==="favoritos")
 renderizarFavoritos();
+if(id==="lixeira")
+renderizarLixeira();
 if(id==="arquivo")
 renderizarArquivo();
 if(id==="editorEventoUniverso"){
@@ -6486,7 +6512,7 @@ item=>String(item.id)===String(id)
 if(!historia)return;
 if(
 !confirm(
-`Excluir "${historia.titulo}"?`
+`Excluir "${historia.titulo}"? Ela irá para a Lixeira, de onde você pode restaurá-la depois.`
 )
 )return;
 historias=
@@ -6495,14 +6521,12 @@ item=>
 String(item.id)!==
 String(id)
 );
-delete estadoItens[
-criarChaveItem(
-TIPOS_ITEM.HISTORIA,
-id
-)
-];
+lixeiraHistorias.unshift({
+...historia,
+excluidoEm:Date.now()
+});
 salvarDados();
-salvarEstadoItens();
+salvarLixeiraHistorias();
 if(
 String(historiaAberta)===
 String(id)
@@ -6511,7 +6535,7 @@ historiaAberta=null
 }
 renderizarTudo();
 mostrarToast(
-"História excluída."
+"História movida para a Lixeira."
 )
 }
 function aplicarFiltro(filtro){
@@ -11683,6 +11707,88 @@ ${p.descricao?`<div class="descricao">${escapar(p.descricao)}</div>`:""}
 area.innerHTML=html
 }
 
+/* =========================================================
+   LIXEIRA DE HISTÓRIAS
+   ========================================================= */
+
+function carregarLixeiraHistorias(){
+lixeiraHistorias=[];
+try{
+const dados=localStorage.getItem(CHAVE_LIXEIRA_HISTORIAS);
+if(dados){
+const lista=JSON.parse(dados);
+if(Array.isArray(lista))lixeiraHistorias=lista
+}
+}catch(erro){
+console.error("Erro ao carregar lixeira de histórias:",erro);
+lixeiraHistorias=[]
+}
+lixeiraHistorias=lixeiraHistorias.filter(Boolean).map(historia=>({
+...historia,
+excluidoEm:Number(historia.excluidoEm)||Date.now()
+}))
+}
+
+function salvarLixeiraHistorias(){
+try{
+localStorage.setItem(CHAVE_LIXEIRA_HISTORIAS,JSON.stringify(lixeiraHistorias))
+}catch(erro){
+console.error("Erro ao salvar lixeira de histórias:",erro);
+alert("Não foi possível salvar os dados neste navegador.")
+}
+}
+
+function renderizarLixeira(){
+const lista=document.getElementById("listaLixeira");
+if(!lista)return;
+if(!lixeiraHistorias.length){
+lista.innerHTML=`
+<div class="card vazio">
+<div class="ilustracao" aria-hidden="true">🗑️</div>
+<h3>A lixeira está vazia.</h3>
+<p>Histórias excluídas aparecem aqui antes de serem removidas de vez.</p>
+</div>
+`;
+return
+}
+lista.innerHTML=lixeiraHistorias.map(historia=>`
+<div class="card">
+<div class="titulo-historia">${escapar(historia.titulo)}</div>
+<div class="meta">Excluída em ${new Date(historia.excluidoEm).toLocaleDateString("pt-BR")}</div>
+${historia.descricao?`<div class="descricao">${escapar(historia.descricao)}</div>`:""}
+<div class="acoes">
+<button class="btn btn-principal" onclick='restaurarHistoriaDaLixeira(${JSON.stringify(historia.id)})'>Restaurar</button>
+<button class="btn btn-perigo" onclick='excluirHistoriaDefinitivamente(${JSON.stringify(historia.id)})'>Excluir definitivamente</button>
+</div>
+</div>
+`).join("")
+}
+
+function restaurarHistoriaDaLixeira(id){
+const historia=lixeiraHistorias.find(item=>String(item.id)===String(id));
+if(!historia)return;
+lixeiraHistorias=lixeiraHistorias.filter(item=>String(item.id)!==String(id));
+const{excluidoEm,...historiaRestaurada}=historia;
+historias.unshift(historiaRestaurada);
+salvarDados();
+salvarLixeiraHistorias();
+renderizarLixeira();
+renderizarTudo();
+mostrarToast("História restaurada.")
+}
+
+function excluirHistoriaDefinitivamente(id){
+const historia=lixeiraHistorias.find(item=>String(item.id)===String(id));
+if(!historia)return;
+if(!confirm(`Excluir "${historia.titulo}" definitivamente? Esta ação não pode ser desfeita.`))return;
+lixeiraHistorias=lixeiraHistorias.filter(item=>String(item.id)!==String(id));
+delete estadoItens[criarChaveItem(TIPOS_ITEM.HISTORIA,id)];
+salvarLixeiraHistorias();
+salvarEstadoItens();
+renderizarLixeira();
+mostrarToast("História excluída definitivamente.")
+}
+
 function renderizarTudo(){
 renderizarInicio();
 renderizarHistorias();
@@ -11866,6 +11972,7 @@ verificarPrazosVencidos();
 verificarConquistas();
 carregarAtividades();
 carregarProjetos();
+carregarLixeiraHistorias();
 carregarDados();
 renderizarTudo();
 atualizarBotaoFlutuante("inicio");
