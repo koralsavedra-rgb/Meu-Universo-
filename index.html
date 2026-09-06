@@ -2807,6 +2807,11 @@ categoria:
 typeof ideia.categoria==="string"&&
 ideia.categoria.trim()?
 ideia.categoria:"Geral",
+evoluidaPara:
+ideia.evoluidaPara&&ideia.evoluidaPara.tipo?{
+tipo:ideia.evoluidaPara.tipo,
+id:ideia.evoluidaPara.id
+}:null,
 criadoEm:
 Number(ideia.criadoEm)||
 Date.now(),
@@ -8004,6 +8009,7 @@ ideiasUniversos[chave]=ideiasUniversos[chave].filter(Boolean).map(ideia=>({
 id:ideia.id||gerarIdIdeiaUniverso(),
 texto:typeof ideia.texto==="string"?ideia.texto:"",
 categoria:typeof ideia.categoria==="string"&&ideia.categoria.trim()?ideia.categoria:"Geral",
+evoluidaPara:ideia.evoluidaPara&&ideia.evoluidaPara.tipo?{tipo:ideia.evoluidaPara.tipo,id:ideia.evoluidaPara.id}:null,
 criadoEm:Number(ideia.criadoEm)||Date.now(),
 atualizadoEm:Number(ideia.atualizadoEm)||Number(ideia.criadoEm)||Date.now()
 }))
@@ -8174,6 +8180,21 @@ ${categoriasPadrao.map(c=>`<option value="${escapar(c)}" ${categoriaSelecionada=
 <div id="categoriaIdeiaUniversoPersonalizada" class="categoria-personalizada ${categoriaSelecionada==="PERSONALIZADA"?"mostrar":""}">
 <input id="categoriaIdeiaUniversoPersonalizadaCampo" type="text" value="${categoriaSelecionada==="PERSONALIZADA"?escapar(categoria):""}" placeholder="Escreva sua categoria...">
 </div>
+${editando?`
+<div class="card" style="margin-top:14px">
+<div class="meta">Transformar em</div>
+${ideia.evoluidaPara?`
+<div class="descricao">Esta ideia já virou um ${obterNomeTipoEvolucao(ideia.evoluidaPara.tipo)}.</div>
+<button class="btn" style="margin-top:8px" onclick='abrirElementoEvoluidoUniverso(${JSON.stringify(ideia.evoluidaPara.tipo)},${JSON.stringify(ideia.evoluidaPara.id)})'>Abrir</button>
+`:`
+<div class="acoes">
+<button class="btn" onclick="transformarIdeiaEmPersonagemUniverso()">👤 Personagem</button>
+<button class="btn" onclick="transformarIdeiaEmLocalUniverso()">📍 Local</button>
+<button class="btn" onclick="transformarIdeiaEmEventoUniverso()">🕰️ Evento</button>
+</div>
+`}
+</div>
+`:""}
 <div class="ideia-acoes">
 <button class="btn btn-perigo" onclick="excluirIdeiaUniverso()" ${editando?"":'style="display:none"'}>Excluir ideia</button>
 <button class="btn btn-principal" onclick="salvarIdeiaUniverso()">Salvar ideia</button>
@@ -9533,6 +9554,21 @@ value="${categoriaSelecionada==="PERSONALIZADA"?escapar(categoria):""}"
 placeholder="Escreva sua categoria..."
 >
 </div>
+${editando?`
+<div class="card" style="margin-top:14px">
+<div class="meta">Transformar em</div>
+${ideia.evoluidaPara?`
+<div class="descricao">Esta ideia já virou um ${obterNomeTipoEvolucao(ideia.evoluidaPara.tipo)}.</div>
+<button class="btn" style="margin-top:8px" onclick='abrirElementoEvoluido(${JSON.stringify(ideia.evoluidaPara.tipo)},${JSON.stringify(ideia.evoluidaPara.id)})'>Abrir</button>
+`:`
+<div class="acoes">
+<button class="btn" onclick="transformarIdeiaEmPersonagem()">👤 Personagem</button>
+<button class="btn" onclick="transformarIdeiaEmLocal()">📍 Local</button>
+<button class="btn" onclick="transformarIdeiaEmEvento()">🕰️ Evento</button>
+</div>
+`}
+</div>
+`:""}
 <div class="ideia-acoes">
 <button
 class="btn btn-perigo"
@@ -11787,6 +11823,127 @@ salvarLixeiraHistorias();
 salvarEstadoItens();
 renderizarLixeira();
 mostrarToast("História excluída definitivamente.")
+}
+
+/* =========================================================
+   EVOLUÇÃO DAS IDEIAS
+   ========================================================= */
+
+function obterNomeTipoEvolucao(tipo){
+return{personagem:"Personagem",local:"Local",evento:"Evento"}[tipo]||"elemento"
+}
+
+function abrirElementoEvoluido(tipo,id){
+if(historiaAberta===null)return;
+if(tipo==="personagem")abrirPersonagem(historiaAberta,id);
+else if(tipo==="local")abrirLocal(historiaAberta,id);
+else if(tipo==="evento")abrirEvento(historiaAberta,id)
+}
+
+function transformarIdeiaEmPersonagem(){
+const historia=historias.find(item=>String(item.id)===String(historiaAberta));
+if(!historia||!Array.isArray(historia.ideias))return;
+const ideia=historia.ideias.find(item=>String(item.id)===String(ideiaEditando));
+if(!ideia||ideia.evoluidaPara)return;
+if(!Array.isArray(historia.personagens))historia.personagens=[];
+const agora=Date.now();
+const personagem={id:gerarIdPersonagem(),nome:ideia.texto,tipo:"Secundário",personalidade:"",aparencia:"",objetivos:"",relacionamentos:[],criadoEm:agora,atualizadoEm:agora};
+historia.personagens.push(personagem);
+ideia.evoluidaPara={tipo:"personagem",id:personagem.id};
+historia.atualizadoEm=agora;
+salvarDados();
+mostrarToast("Ideia transformada em personagem.");
+abrirPersonagem(historia.id,personagem.id)
+}
+
+function transformarIdeiaEmLocal(){
+const historia=historias.find(item=>String(item.id)===String(historiaAberta));
+if(!historia||!Array.isArray(historia.ideias))return;
+const ideia=historia.ideias.find(item=>String(item.id)===String(ideiaEditando));
+if(!ideia||ideia.evoluidaPara)return;
+if(!Array.isArray(historia.locais))historia.locais=[];
+const agora=Date.now();
+const local={id:gerarIdLocal(),nome:ideia.texto,tipo:"Outro",descricao:"",clima:"",geografia:"",personagensRelacionados:[],criadoEm:agora,atualizadoEm:agora};
+historia.locais.push(local);
+ideia.evoluidaPara={tipo:"local",id:local.id};
+historia.atualizadoEm=agora;
+salvarDados();
+mostrarToast("Ideia transformada em local.");
+abrirLocal(historia.id,local.id)
+}
+
+function transformarIdeiaEmEvento(){
+const historia=historias.find(item=>String(item.id)===String(historiaAberta));
+if(!historia||!Array.isArray(historia.ideias))return;
+const ideia=historia.ideias.find(item=>String(item.id)===String(ideiaEditando));
+if(!ideia||ideia.evoluidaPara)return;
+if(!Array.isArray(historia.eventos))historia.eventos=[];
+const agora=Date.now();
+const evento={id:gerarIdEvento(),nome:ideia.texto,data:"",localId:"",personagensEnvolvidos:[],consequencias:"",criadoEm:agora,atualizadoEm:agora};
+historia.eventos.push(evento);
+ideia.evoluidaPara={tipo:"evento",id:evento.id};
+historia.atualizadoEm=agora;
+salvarDados();
+mostrarToast("Ideia transformada em evento.");
+abrirEvento(historia.id,evento.id)
+}
+
+function abrirElementoEvoluidoUniverso(tipo,id){
+if(universoAberto===null)return;
+if(tipo==="personagem")abrirPersonagemUniverso(universoAberto,id);
+else if(tipo==="local")abrirLocalUniverso(universoAberto,id);
+else if(tipo==="evento")abrirEventoUniverso(universoAberto,id)
+}
+
+function transformarIdeiaEmPersonagemUniverso(){
+if(universoAberto===null)return;
+const chave=universoAberto;
+const ideias=obterIdeiasUniverso(chave);
+const ideia=ideias.find(item=>String(item.id)===String(ideiaUniversoEditando));
+if(!ideia||ideia.evoluidaPara)return;
+const personagens=obterPersonagensUniverso(chave);
+const agora=Date.now();
+const personagem={id:gerarIdPersonagem(),nome:ideia.texto,tipo:"Secundário",personalidade:"",aparencia:"",objetivos:"",relacionamentos:[],criadoEm:agora,atualizadoEm:agora};
+personagens.push(personagem);
+ideia.evoluidaPara={tipo:"personagem",id:personagem.id};
+salvarPersonagensUniversos();
+salvarIdeiasUniversos();
+mostrarToast("Ideia transformada em personagem.");
+abrirPersonagemUniverso(chave,personagem.id)
+}
+
+function transformarIdeiaEmLocalUniverso(){
+if(universoAberto===null)return;
+const chave=universoAberto;
+const ideias=obterIdeiasUniverso(chave);
+const ideia=ideias.find(item=>String(item.id)===String(ideiaUniversoEditando));
+if(!ideia||ideia.evoluidaPara)return;
+const locais=obterLocaisUniverso(chave);
+const agora=Date.now();
+const local={id:gerarIdLocal(),nome:ideia.texto,tipo:"Outro",descricao:"",clima:"",geografia:"",personagensRelacionados:[],criadoEm:agora,atualizadoEm:agora};
+locais.push(local);
+ideia.evoluidaPara={tipo:"local",id:local.id};
+salvarLocaisUniversos();
+salvarIdeiasUniversos();
+mostrarToast("Ideia transformada em local.");
+abrirLocalUniverso(chave,local.id)
+}
+
+function transformarIdeiaEmEventoUniverso(){
+if(universoAberto===null)return;
+const chave=universoAberto;
+const ideias=obterIdeiasUniverso(chave);
+const ideia=ideias.find(item=>String(item.id)===String(ideiaUniversoEditando));
+if(!ideia||ideia.evoluidaPara)return;
+const eventos=obterEventosUniverso(chave);
+const agora=Date.now();
+const evento={id:gerarIdEvento(),nome:ideia.texto,data:"",localId:"",personagensEnvolvidos:[],consequencias:"",criadoEm:agora,atualizadoEm:agora};
+eventos.push(evento);
+ideia.evoluidaPara={tipo:"evento",id:evento.id};
+salvarEventosUniversos();
+salvarIdeiasUniversos();
+mostrarToast("Ideia transformada em evento.");
+abrirEventoUniverso(chave,evento.id)
 }
 
 function renderizarTudo(){
