@@ -3730,6 +3730,7 @@ horaSalva?
 "Salvo"
 }
 </div>
+<div id="estatisticasCapitulo" class="status-salvamento"></div>
 </div>
 </div>
 <div class="editor-capitulo-card">
@@ -3750,7 +3751,7 @@ Texto
 <textarea
 id="campoTextoCapitulo"
 placeholder="Comece a escrever seu capítulo..."
-oninput="agendarSalvamentoCapitulo()"
+oninput="agendarSalvamentoCapitulo();atualizarEstatisticasCapitulo()"
 >${escapar(capitulo.texto||"")}</textarea>
 <div class="aviso-autosalvamento">
 O capítulo é salvo automaticamente enquanto você escreve.
@@ -3764,8 +3765,21 @@ Excluir capítulo
 </button>
 </div>
 </div>
-`
+`;
+atualizarEstatisticasCapitulo()
 }
+
+function atualizarEstatisticasCapitulo(){
+const area=document.getElementById("estatisticasCapitulo");
+const campoTexto=document.getElementById("campoTextoCapitulo");
+if(!area||!campoTexto)return;
+const texto=campoTexto.value||"";
+const palavras=texto.trim()?texto.trim().split(/\s+/).length:0;
+const caracteres=texto.length;
+const paginas=palavras?Math.max(1,Math.ceil(palavras/250)):0;
+area.textContent=`${palavras} palavras · ${caracteres} caracteres · ${paginas} ${paginas===1?"página":"páginas"} (estimado)`
+}
+
 function agendarSalvamentoCapitulo(){
 if(temporizadorSalvamentoCapitulo){
 clearTimeout(
