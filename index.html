@@ -1311,6 +1311,16 @@ min-width:120px
 }
 
 
+
+/* Atributos flexíveis */
+.lista-atributos{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.linha-atributo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr) auto;gap:7px;align-items:center}
+.linha-atributo input{min-width:0}
+.linha-atributo .btn-remover-atributo{flex-shrink:0;width:38px;height:38px;padding:0;border-radius:10px}
+.acoes-atributos{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.acoes-atributos .btn{flex:1;min-width:130px}
+.atributos-vazio{font-size:11px;color:var(--texto-suave);line-height:1.45;background:#f8f4f6;border-radius:12px;padding:11px;margin-top:9px}
+
 </style>
 </head>
 <body>
@@ -2425,8 +2435,18 @@ objeto&&
 typeof objeto==="object"&&
 !Array.isArray(objeto)
 ){
-dadosUniversos=objeto
+dadosUniversos=objeto;
+Object.keys(dadosUniversos).forEach(chave=>{
+const dados=dadosUniversos[chave];
+if(dados&&typeof dados==="object"&&!Array.isArray(dados)){
+dadosUniversos[chave]={
+...dados,
+atributos:normalizarAtributos(dados.atributos)
 }
+}
+});
+}
+
 }
 }catch(erro){
 console.error(
@@ -2478,6 +2498,7 @@ tipo:typeof personagem.tipo==="string"?personagem.tipo:"Secundário",
 personalidade:typeof personagem.personalidade==="string"?personagem.personalidade:"",
 aparencia:typeof personagem.aparencia==="string"?personagem.aparencia:"",
 objetivos:typeof personagem.objetivos==="string"?personagem.objetivos:"",
+atributos:normalizarAtributos(personagem.atributos),
 relacionamentos:Array.isArray(personagem.relacionamentos)?personagem.relacionamentos.filter(Boolean).map(relacionamento=>({
 id:relacionamento.id||gerarIdRelacionamento(),
 personagemRelacionadoId:relacionamento.personagemRelacionadoId!==undefined&&relacionamento.personagemRelacionadoId!==null?String(relacionamento.personagemRelacionadoId):"",
@@ -2516,6 +2537,7 @@ geopolitica:typeof dados.geopolitica==="string"?dados.geopolitica:"",
 clima:typeof dados.clima==="string"?dados.clima:"",
 cultura:typeof dados.cultura==="string"?dados.cultura:"",
 magia:typeof dados.magia==="string"?dados.magia:"",
+atributos:normalizarAtributos(dados.atributos),
 atualizadoEm:Number(dados.atualizadoEm)||0
 }
 }
@@ -2526,6 +2548,7 @@ geopolitica:"",
 clima:"",
 cultura:"",
 magia:"",
+atributos:[],
 atualizadoEm:0
 }
 }
@@ -2674,6 +2697,8 @@ personagem.aparencia:"",
 objetivos:
 typeof personagem.objetivos==="string"?
 personagem.objetivos:"",
+atributos:
+normalizarAtributos(personagem.atributos),
 relacionamentos:
 Array.isArray(personagem.relacionamentos)?
 personagem.relacionamentos
@@ -2829,6 +2854,8 @@ personagens,
 locais,
 eventos,
 arquivos,
+atributos:
+normalizarAtributos(historia.atributos),
 atualizadoEm:
 Number(historia.atualizadoEm)||
 Date.now(),
@@ -2852,6 +2879,86 @@ estado.favorito===true;
 salvarDados();
 salvarEstadoItens()
 }
+
+function normalizarAtributos(lista){
+if(!Array.isArray(lista))return[];
+return lista.filter(Boolean).map(atributo=>({
+nome:typeof atributo.nome==="string"?atributo.nome:"",
+valor:typeof atributo.valor==="string"?atributo.valor:""
+})).filter(atributo=>atributo.nome.trim()!==""||atributo.valor.trim()!=="")
+}
+function gerarListaAtributos(atributos=[],prefixo="atributo"){
+const lista=normalizarAtributos(atributos);
+return `<div class="lista-atributos" data-lista-atributos="${escapar(prefixo)}">${
+lista.length?lista.map(atributo=>gerarLinhaAtributo(atributo.nome,atributo.valor)).join(""):""
+}</div>`
+}
+function gerarLinhaAtributo(nome="",valor=""){
+return `<div class="linha-atributo" data-linha-atributo>
+<input type="text" data-atributo-nome value="${escapar(nome)}" placeholder="Nome do atributo" autocomplete="off">
+<input type="text" data-atributo-valor value="${escapar(valor)}" placeholder="Valor" autocomplete="off">
+<button type="button" class="btn btn-perigo btn-remover-atributo" onclick="this.closest('[data-linha-atributo]').remove()" aria-label="Remover atributo" title="Remover atributo">×</button>
+</div>`
+}
+function adicionarLinhaAtributo(idLista){
+const lista=document.getElementById(idLista);
+if(!lista)return;
+lista.insertAdjacentHTML("beforeend",gerarLinhaAtributo());
+const linhas=lista.querySelectorAll("[data-linha-atributo]");
+const ultima=linhas[linhas.length-1];
+const campo=ultima?.querySelector("[data-atributo-nome]");
+if(campo)campo.focus()
+}
+function lerAtributos(idLista){
+const lista=document.getElementById(idLista);
+if(!lista)return[];
+return Array.from(lista.querySelectorAll("[data-linha-atributo]")).map(linha=>({
+nome:linha.querySelector("[data-atributo-nome]")?.value.trim()||"",
+valor:linha.querySelector("[data-atributo-valor]")?.value.trim()||""
+})).filter(atributo=>atributo.nome!==""||atributo.valor!=="")
+}
+function gerarConteudoAtributos(atributos,tipo,chave){
+const idLista=tipo==="historia"?"listaAtributosHistoria":"listaAtributosUniverso";
+const prefixo=tipo==="historia"?"historia":"universo";
+return `<div class="detalhe-secao">
+<h2>🏷️ Atributos</h2>
+<div class="formulario-universo">
+<div class="aviso-formulario">✦ Use estes campos para guardar qualquer informação que não se encaixe nas outras abas. O nome e o valor são texto livre.</div>
+${gerarListaAtributos(atributos,prefixo).replace(`data-lista-atributos="${prefixo}"`,`id="${idLista}" data-lista-atributos="${prefixo}"`)}
+<div class="acoes-atributos">
+<button type="button" class="btn" onclick="adicionarLinhaAtributo('${idLista}')">＋ Adicionar atributo</button>
+<button type="button" class="btn btn-principal" onclick="salvarAtributos('${tipo}',${JSON.stringify(chave)})">Salvar atributos</button>
+</div>
+</div>
+</div>`
+}
+function salvarAtributos(tipo,chave){
+if(tipo==="historia"){
+const historia=historias.find(item=>String(item.id)===String(chave));
+if(!historia)return;
+historia.atributos=lerAtributos("listaAtributosHistoria");
+historia.atualizadoEm=Date.now();
+salvarDados();
+marcarComoRecente(TIPOS_ITEM.HISTORIA,historia.id);
+mostrarToast("Atributos da história salvos.");
+renderizarHistoriaDetalhe();
+return
+}
+if(tipo==="universo"){
+if(chave===null||chave===undefined)return;
+const dados=obterDadosUniverso(chave);
+dados.atributos=lerAtributos("listaAtributosUniverso");
+dados.atualizadoEm=Date.now();
+dadosUniversos[chave]=dados;
+salvarDadosUniversos();
+const estado=garantirEstadoItem(TIPOS_ITEM.UNIVERSO,chave,dados.atualizadoEm);
+estado.atualizadoEm=dados.atualizadoEm;
+salvarEstadoItens();
+mostrarToast("Atributos do universo salvos.");
+renderizarUniversoDetalhe();
+}
+}
+
 function salvarDados(){
 try{
 localStorage.setItem(
@@ -3283,6 +3390,10 @@ const abas=[
 [
 "arquivos",
 "📁Arquivos"
+],
+[
+"atributos",
+"🏷️ Atributos"
 ]
 ];
 const conteudos={
@@ -3299,7 +3410,9 @@ gerarConteudoIdeias(historia),
 conexoes:
 gerarConteudoConexoes(historia),
 arquivos:
-gerarConteudoArquivos(historia)
+gerarConteudoArquivos(historia),
+atributos:
+gerarConteudoAtributos(historia.atributos,"historia",historia.id)
 };
 area.innerHTML=`
 <div class="detalhe-cabecalho">
@@ -4368,6 +4481,11 @@ Objetivos
 id="campoObjetivosPersonagem"
 placeholder="O que esse personagem quer, busca ou pretende alcançar?"
 >${escapar(objetivos)}</textarea>
+<label>Atributos</label>
+${gerarListaAtributos(personagem?.atributos||[],"personagem").replace('data-lista-atributos="personagem"','id="listaAtributosPersonagem" data-lista-atributos="personagem"')}
+<div class="acoes-atributos">
+<button type="button" class="btn" onclick="adicionarLinhaAtributo('listaAtributosPersonagem')">＋ Adicionar atributo</button>
+</div>
 <div class="relacionamentos-personagem">
 <div class="relacionamentos-personagem-titulo">
 Relacionamentos
@@ -4499,6 +4617,7 @@ tipo,
 personalidade,
 aparencia,
 objetivos,
+atributos:lerAtributos("listaAtributosPersonagem"),
 relacionamentos:
 Array.isArray(personagemExistente.relacionamentos)?
 personagemExistente.relacionamentos:[],
@@ -4532,6 +4651,7 @@ tipo,
 personalidade,
 aparencia,
 objetivos,
+atributos:lerAtributos("listaAtributosPersonagem"),
 relacionamentos:[],
 criadoEm:
 agora,
@@ -7051,7 +7171,8 @@ const abas=[
 ["locais","📍 Locais"],
 ["cronologia","🕰️ Cronologia"],
 ["ideias","💡 Ideias"],
-["conexoes","🔗 Conexões"]
+["conexoes","🔗 Conexões"],
+["atributos","🏷️ Atributos"]
 ];
 area.innerHTML=`
 <div class="detalhe-cabecalho">
@@ -7213,6 +7334,11 @@ ${gerarConteudoIdeiasUniverso(chave)}
 class="conteudo-aba-detalhe ${abaUniversoAtual==="conexoes"?"ativa":""}"
 >
 ${gerarConteudoConexoesUniverso(chave)}
+</div>
+<div
+class="conteudo-aba-detalhe ${abaUniversoAtual==="atributos"?"ativa":""}"
+>
+${gerarConteudoAtributos(dados.atributos,"universo",chave)}
 </div>
 `;
 }
@@ -8603,6 +8729,11 @@ ${tiposPadrao.map(tipoPadrao=>`
 <textarea id="campoAparenciaPersonagemUniverso" placeholder="Descreva a aparência física, roupas, características marcantes...">${escapar(aparencia)}</textarea>
 <label for="campoObjetivosPersonagemUniverso">Objetivos</label>
 <textarea id="campoObjetivosPersonagemUniverso" placeholder="O que esse personagem quer, busca ou pretende alcançar?">${escapar(objetivos)}</textarea>
+<label>Atributos</label>
+${gerarListaAtributos(personagem?.atributos||[],"personagem-universo").replace('data-lista-atributos="personagem-universo"','id="listaAtributosPersonagemUniverso" data-lista-atributos="personagem-universo"')}
+<div class="acoes-atributos">
+<button type="button" class="btn" onclick="adicionarLinhaAtributo('listaAtributosPersonagemUniverso')">＋ Adicionar atributo</button>
+</div>
 <div class="relacionamentos-personagem-universo">
 <div class="relacionamentos-personagem-universo-titulo">Relacionamentos</div>
 ${gerarConteudoRelacionamentosPersonagemUniverso(personagem,relacionamentos,outrosPersonagens)}
@@ -8647,7 +8778,7 @@ if(personagemUniversoEditando!==null){
 const indice=personagens.findIndex(item=>String(item.id)===String(personagemUniversoEditando));
 if(indice!==-1){
 const existente=personagens[indice];
-personagens[indice]={...existente,nome,tipo,personalidade,aparencia,objetivos,relacionamentos:Array.isArray(existente.relacionamentos)?existente.relacionamentos:[],atualizadoEm:agora};
+personagens[indice]={...existente,nome,tipo,personalidade,aparencia,objetivos,atributos:lerAtributos("listaAtributosPersonagemUniverso"),relacionamentos:Array.isArray(existente.relacionamentos)?existente.relacionamentos:[],atualizadoEm:agora};
 salvarPersonagensUniversos();
 personagemUniversoEditando=null;
 mostrandoFormularioRelacionamentoUniverso=false;
@@ -8657,7 +8788,7 @@ mostrarToast("Personagem do universo atualizado.");
 return
 }
 }
-personagens.unshift({id:gerarIdPersonagem(),nome,tipo,personalidade,aparencia,objetivos,relacionamentos:[],criadoEm:agora,atualizadoEm:agora});
+personagens.unshift({id:gerarIdPersonagem(),nome,tipo,personalidade,aparencia,objetivos,atributos:lerAtributos("listaAtributosPersonagemUniverso"),relacionamentos:[],criadoEm:agora,atualizadoEm:agora});
 salvarPersonagensUniversos();
 personagemUniversoEditando=null;
 mostrandoFormularioRelacionamentoUniverso=false;
