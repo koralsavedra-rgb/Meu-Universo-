@@ -2279,20 +2279,25 @@ frequência para não correr o risco de perder tudo.
 Compartilha ou copia um arquivo com tudo: histórias, universos,
 personagens, locais, eventos, jornadas, lembretes, pontos, XP e conquistas.
 </div>
-<div style="display:flex;gap:7px;margin-top:12px">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px">
 <button
 class="btn btn-principal"
-style="flex:1"
-onclick="exportarDados()"
+onclick="salvarBackupArquivo()"
 >
-Baixar/Compartilhar arquivo
+💾 Salvar arquivo
 </button>
 <button
 class="btn"
-style="flex:1"
+onclick="compartilharBackupArquivo()"
+>
+📤 Compartilhar
+</button>
+<button
+class="btn"
+style="grid-column:1 / -1"
 onclick="copiarTextoBackupDireto()"
 >
-Copiar texto do backup
+📋 Copiar texto do backup
 </button>
 </div>
 <div id="containerBackupTexto" style="display:none;margin-top:12px">
@@ -2305,6 +2310,13 @@ id="areaBackupTexto"
 readonly
 style="min-height:150px;margin-top:8px;font-size:10px;font-family:monospace"
 ></textarea>
+<button
+class="btn"
+style="width:100%;margin-top:8px"
+onclick="copiarBackupTexto()"
+>
+📋 Copiar backup para guardar
+</button>
 </div>
 </div>
 
@@ -14013,71 +14025,102 @@ function gerarConteudoBackup(){
  return JSON.stringify(pacote,null,2)
 }
 
-async function exportarDados(){
+async function salvarBackupArquivo(){
  const conteudo=gerarConteudoBackup();
  const dataFormatada=new Date().toISOString().slice(0,10);
  const nomeArquivo=`meu-universo-backup-${dataFormatada}.json`;
 
- // 1. Tentar compartilhar o arquivo diretamente.
- try{
- const arquivo=new File([conteudo],nomeArquivo,{type:"application/json"});
- if(navigator.canShare&&navigator.canShare({files:[arquivo]})){
- try{
- await navigator.share({
- files:[arquivo],
- title:"Backup Meu Universo",
- text:"Backup dos dados do Meu Universo"
- });
- mostrarToast("Backup compartilhado.");
- return
- }catch(erroCompartilharArquivo){
- if(erroCompartilharArquivo&&erroCompartilharArquivo.name==="AbortError")return;
- console.error("Não foi possível compartilhar o arquivo diretamente:",erroCompartilharArquivo)
- }
- }
- }catch(erroArquivo){
- console.error("Não foi possível preparar o arquivo de backup:",erroArquivo)
- }
-
- // 2. Se o compartilhamento de arquivo não funcionar, tentar compartilhar apenas o texto.
- try{
- if(navigator.share){
- await navigator.share({
- text:conteudo,
- title:"Backup Meu Universo"
- });
- mostrarToast("Backup compartilhado.");
- return
- }
- }catch(erroCompartilharTexto){
- if(erroCompartilharTexto&&erroCompartilharTexto.name==="AbortError")return;
- console.error("Não foi possível compartilhar o backup como texto:",erroCompartilharTexto)
+ // Primeira opção: seletor de salvamento do navegador, quando disponível.
+ if(window.showSaveFilePicker){
+  try{
+   const handle=await window.showSaveFilePicker({
+    suggestedName:nomeArquivo,
+    types:[{
+     description:"Backup do Meu Universo",
+     accept:{"application/json":[".json"]}
+    }]
+   });
+   const writable=await handle.createWritable();
+   await writable.write(conteudo);
+   await writable.close();
+   mostrarToast("Backup salvo com sucesso.");
+   return true;
+  }catch(erro){
+   if(erro&&erro.name==="AbortError")return false;
+   console.error("Erro ao usar o seletor de arquivos:",erro);
+  }
  }
 
- // 3. Tentar baixar usando uma URI data:.
+ // Segunda opção: download tradicional. Alguns ambientes Android/WebView
+ // podem bloquear esta etapa, por isso ela não é a única forma de backup.
  try{
- const bytes=new TextEncoder().encode(conteudo);
- let binario="";
- const tamanhoBloco=0x8000;
- for(let i=0;i<bytes.length;i+=tamanhoBloco){
- binario+=String.fromCharCode(...bytes.subarray(i,Math.min(i+tamanhoBloco,bytes.length)));
+  const blob=new Blob([conteudo],{type:"application/json;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");
+  link.href=url;
+  link.download=nomeArquivo;
+  link.style.display="none";
+  document.body.appendChild(link);
+  link.click();
+  setTimeout(()=>{
+   link.remove();
+   URL.revokeObjectURL(url);
+  },5000);
+  mostrarToast("Tentativa de salvar o arquivo iniciada.");
+  return true;
+ }catch(erro){
+  console.error("Não foi possível salvar o arquivo:",erro);
+  mostrarToast("Não foi possível salvar o arquivo. Tente compartilhar ou copiar o texto.");
+  return false;
  }
- const base64DoConteudo=btoa(binario);
- const link=document.createElement("a");
- link.href=`data:application/json;base64,${base64DoConteudo}`;
- link.download=nomeArquivo;
- link.style.display="none";
- document.body.appendChild(link);
- link.click();
- link.remove();
- mostrarToast("Download iniciado.");
- return
- }catch(erroDownloadData){
- console.error("Não foi possível baixar o backup pela URI data:",erroDownloadData)
+}
+
+async function compartilharBackupArquivo(){
+ const conteudo=gerarConteudoBackup();
+ const dataFormatada=new Date().toISOString().slice(0,10);
+ const nomeArquivo=`meu-universo-backup-${dataFormatada}.json`;
+
+ if(!navigator.share){
+  mostrarToast("O compartilhamento não está disponível neste ambiente. Use 'Salvar arquivo' ou 'Copiar texto'.");
+  return false;
  }
 
- // As três tentativas falharam: não abrir automaticamente o modo copiar/colar.
- mostrarToast("Não foi possível gerar o arquivo. Use o botão de copiar/colar abaixo.");
+ // Tentar compartilhar o arquivo JSON diretamente.
+ try{
+  const arquivo=new File([conteudo],nomeArquivo,{type:"application/json"});
+  if(navigator.canShare&&navigator.canShare({files:[arquivo]})){
+   await navigator.share({
+    files:[arquivo],
+    title:"Backup Meu Universo",
+    text:"Backup dos dados do Meu Universo"
+   });
+   mostrarToast("Backup compartilhado.");
+   return true;
+  }
+ }catch(erro){
+  if(erro&&erro.name==="AbortError")return false;
+  console.error("Compartilhamento de arquivo indisponível:",erro);
+ }
+
+ // Fallback: compartilhar o próprio texto do backup.
+ try{
+  await navigator.share({
+   title:"Backup Meu Universo",
+   text:conteudo
+  });
+  mostrarToast("Backup compartilhado como texto.");
+  return true;
+ }catch(erroTexto){
+  if(erroTexto&&erroTexto.name==="AbortError")return false;
+  console.error("Compartilhamento do texto indisponível:",erroTexto);
+  mostrarToast("Não foi possível compartilhar. Use 'Copiar texto do backup'.");
+  return false;
+ }
+}
+
+function exportarDados(){
+ // Mantém compatibilidade com qualquer parte do app que ainda chame o nome antigo.
+ return salvarBackupArquivo();
 }
 
 function copiarTextoBackupDireto(){
@@ -14248,5 +14291,20 @@ telaAbertura.remove()
 },1600);
 </script>
 </div>
+<div style="margin:12px 0;text-align:center"><button class="btn" onclick="diagnosticoAmbienteAndroid()">🔎 Diagnóstico Android</button></div>
+<script>
+function diagnosticoAmbienteAndroid(){
+ const nomes=["Android","android","AppsGeyser","appsgeyser","AppsGeyserInterface","JavascriptInterface","JSInterface","AndroidInterface","Native","native","Bridge","bridge","File","file","Share","share"];
+ const achados=[];
+ nomes.forEach(nome=>{try{if(typeof window[nome]!=="undefined")achados.push(nome+" = "+typeof window[nome]);}catch(e){}});
+ let chaves=[]; try{chaves=Object.keys(window).filter(k=>/android|appsgeyser|bridge|native|file|share|javascriptinterface/i.test(k)).slice(0,100)}catch(e){}
+ const ua=navigator.userAgent||"";
+ const dados={userAgent:ua,interfacesEncontradas:achados,chavesRelacionadas:chaves,navigatorShare:typeof navigator.share==="function",navigatorCanShare:typeof navigator.canShare==="function",showSaveFilePicker:typeof window.showSaveFilePicker==="function",clipboard:!!(navigator.clipboard),fileApi:typeof File!=="undefined",blobApi:typeof Blob!=="undefined"};
+ const texto=JSON.stringify(dados,null,2);
+ const area=document.createElement("textarea"); area.value=texto; area.style.cssText="position:fixed;left:8px;right:8px;top:8px;height:60vh;z-index:99999;background:white;color:#111;padding:12px;font:12px monospace;border:2px solid #d96b91;border-radius:10px";
+ document.body.appendChild(area); area.focus(); area.select();
+ alert("Diagnóstico concluído. O resultado está selecionado para você copiar.\n\nNão foi feita nenhuma alteração no backup nem nos dados do app.");
+}
+</script>
 </body>
 </html>
