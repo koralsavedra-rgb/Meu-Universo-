@@ -6,7 +6,39 @@
 <title>Meu Universo</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB4PSI3IiB5PSI3IiB3aWR0aD0iMTY2IiBoZWlnaHQ9IjE2NiIgcng9IjQyIiBmaWxsPSIjMGIwYTBkIi8+PGNpcmNsZSBjeD0iOTAiIGN5PSI5MCIgcj0iNzIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjIiIG9wYWNpdHk9Ii45Ii8+PGNpcmNsZSBjeD0iOTAiIGN5PSI5MCIgcj0iNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Q5NmI5MSIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIuOCIgc3Ryb2tlLWRhc2hhcnJheT0iNCA0Ii8+PHBhdGggZD0iTTkwIDI3QTYzIDYzIDAgMSAwIDE1MyA5MEE1MyA1MyAwIDEgMSA5MCAyN1oiIGZpbGw9IiNkOTZiOTEiLz48cGF0aCBkPSJNOTAgMzVBNTUgNTUgMCAxIDAgMTQ1IDkwQTQ2IDQ2IDAgMSAxIDkwIDM1WiIgZmlsbD0iI2YwYjdjNiIgb3BhY2l0eT0iLjU1Ii8+PHBhdGggZD0iTTI3IDExM1E5MCA0OCAxNTQgNzkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIuOTUiLz48Y2lyY2xlIGN4PSIxMjciIGN5PSI3MiIgcj0iMTAiIGZpbGw9IiMwYjBhMGQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48Y2lyY2xlIGN4PSIxMjciIGN5PSI3MiIgcj0iMyIgZmlsbD0iI2Q5NmI5MSIvPjxjaXJjbGUgY3g9IjQ5IiBjeT0iMTA0IiByPSI1IiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNDkiIGN5PSIxMDQiIHI9IjIiIGZpbGw9IiNkOTZiOTEiLz48cGF0aCBkPSJNOTAgMTV2MTRNOTAgMTUxdjE0TTE1IDkwaDE0TTE1MSA5MGgxNCIgc3Ryb2tlPSIjZDk2YjkxIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxwYXRoIGQ9Ik05MCAxNGwzIDYtMyA2LTMtNnpNOTAgMTU0bDMgNi0zIDYtMy02eiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yNSA5MGw2LTMgNiAzLTYgM3pNMTQzIDkwbDYtMyA2IDMtNiAzeiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==">
 <style>
+<script>(function(){try{var p=JSON.parse(localStorage.getItem("meu_universo_0_1_preferencias")||"null")||{};var d=document.documentElement,b=document.body;if(!b)return;d.style.setProperty("--escala-fonte",p.tamanhoFonte==="pequena"?"14px":p.tamanhoFonte==="grande"?"18px":"16px");b.classList.toggle("tema-escuro",p.tema==="escuro");b.classList.remove("tema-lilas","tema-verde-salvia","tema-azul-cinza");if(p.corTema&&p.corTema!=="rosa")b.classList.add("tema-"+p.corTema);b.classList.toggle("densidade-compacta",p.densidade==="compacta");b.classList.toggle("sem-dicas",p.mostrarDicas===false)}catch(e){}})();</script>
 :root{--fundo:#fffdfd;--branco:#fff;--texto:#211d21;--texto-suave:#766f75;--rosa:#d96b91;--rosa-claro:#fcf1f5;--linha:#e8e0e5;--escuro:#171519}
+html{font-size:16px}
+body{font-size:var(--escala-fonte,16px)}
+body.tema-escuro{--fundo:#171519;--branco:#242126;--texto:#f7f2f5;--texto-suave:#bdb4ba;--rosa:#e69ab4;--rosa-claro:#3a2831;--linha:#413a42;--escuro:#0b0a0d}
+body.tema-escuro header{background:rgba(23,21,25,.96)}
+body.tema-escuro input,body.tema-escuro textarea,body.tema-escuro select,body.tema-escuro .btn,body.tema-escuro .busca,body.tema-escuro .filtro{background:var(--branco);color:var(--texto)}
+body.tema-escuro .estatistica{background:#201d22}
+body.tema-escuro .descricao{color:var(--texto-suave)}
+body.tema-lilas{--rosa:#9b82c7;--rosa-claro:#f1edfa;--linha:#e1dbea}
+body.tema-verde-salvia{--rosa:#7f9f88;--rosa-claro:#edf4ef;--linha:#dce6df}
+body.tema-azul-cinza{--rosa:#718ca8;--rosa-claro:#edf2f6;--linha:#dce3e9}
+body.densidade-compacta .card{padding:11px;margin-bottom:7px}
+body.densidade-compacta .estatistica{padding:8px}
+body.densidade-compacta .acoes{gap:5px;margin-top:9px}
+body.densidade-compacta .badges,body.densidade-compacta .tags{gap:4px;margin-top:7px}
+body.densidade-compacta .filtros{gap:4px;padding-bottom:4px}
+body.densidade-compacta .btn{padding:8px 11px}
+body.sem-dicas .texto-intro,body.sem-dicas .aviso-formulario{display:none!important}
+.configuracao-opcao{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--linha)}
+.configuracao-opcao:last-child{border-bottom:0}
+.configuracao-opcao-texto{flex:1;min-width:0}
+.configuracao-opcao-titulo{font-size:13px;font-weight:700}
+.configuracao-opcao-descricao{font-size:10px;color:var(--texto-suave);line-height:1.4;margin-top:3px}
+.configuracao-controle{flex:0 0 auto}
+.configuracao-controle select{width:auto;min-width:150px;padding:8px 10px}
+.configuracao-toggle{position:relative;width:46px;height:26px;display:inline-block}
+.configuracao-toggle input{opacity:0;width:0;height:0}
+.configuracao-toggle-slider{position:absolute;inset:0;border-radius:999px;background:var(--linha);transition:.18s;cursor:pointer}
+.configuracao-toggle-slider:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,.18);transition:.18s}
+.configuracao-toggle input:checked+.configuracao-toggle-slider{background:var(--rosa)}
+.configuracao-toggle input:checked+.configuracao-toggle-slider:before{transform:translateX(20px)}
+
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--fundo);color:var(--texto);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif} button,input,textarea,select{font:inherit} button{cursor:pointer}
@@ -2269,6 +2301,46 @@ Copiar texto do backup
 </div>
 
 <div class="card" style="margin-top:10px">
+<div class="titulo-historia">✦ Personalização</div>
+<div class="descricao">Ajuste a aparência e o comportamento do Meu Universo. As escolhas são salvas neste aparelho.</div>
+
+<div class="configuracao-opcao">
+<div class="configuracao-opcao-texto"><div class="configuracao-opcao-titulo">Tema claro/escuro</div><div class="configuracao-opcao-descricao">Alterna entre a aparência clara e escura.</div></div>
+<div class="configuracao-controle"><label class="configuracao-toggle" aria-label="Tema escuro"><input id="preferenciaTemaEscuro" type="checkbox" onchange="alterarPreferenciaTema(this.checked)"><span class="configuracao-toggle-slider"></span></label></div>
+</div>
+
+<div class="configuracao-opcao">
+<div class="configuracao-opcao-texto"><div class="configuracao-opcao-titulo">Tamanho da fonte</div><div class="configuracao-opcao-descricao">Escolha o tamanho geral da interface.</div></div>
+<div class="configuracao-controle"><select id="preferenciaTamanhoFonte" onchange="alterarPreferenciaTamanhoFonte(this.value)"><option value="pequena">Pequena</option><option value="media">Média</option><option value="grande">Grande</option></select></div>
+</div>
+
+<div class="configuracao-opcao">
+<div class="configuracao-opcao-texto"><div class="configuracao-opcao-titulo">Tema de cor</div><div class="configuracao-opcao-descricao">Escolha a cor principal da interface.</div></div>
+<div class="configuracao-controle"><select id="preferenciaCorTema" onchange="alterarPreferenciaCorTema(this.value)"><option value="rosa">Rosa</option><option value="lilas">Lilás</option><option value="verde-salvia">Verde-sálvia</option><option value="azul-cinza">Azul-acinzentado</option></select></div>
+</div>
+
+<div class="configuracao-opcao">
+<div class="configuracao-opcao-texto"><div class="configuracao-opcao-titulo">Densidade da interface</div><div class="configuracao-opcao-descricao">Compacta reduz os espaçamentos; Confortável mantém o padrão atual.</div></div>
+<div class="configuracao-controle"><select id="preferenciaDensidade" onchange="alterarPreferenciaDensidade(this.value)"><option value="confortavel">Confortável</option><option value="compacta">Compacta</option></select></div>
+</div>
+
+<div class="configuracao-opcao">
+<div class="configuracao-opcao-texto"><div class="configuracao-opcao-titulo">Tela inicial padrão</div><div class="configuracao-opcao-descricao">Tela aberta automaticamente ao iniciar o app.</div></div>
+<div class="configuracao-controle"><select id="preferenciaTelaInicial" onchange="alterarPreferenciaTelaInicial(this.value)"><option value="inicio">Início</option><option value="planner">Planner</option><option value="jornadas">Jornada</option><option value="historias">Histórias</option></select></div>
+</div>
+
+<div class="configuracao-opcao">
+<div class="configuracao-opcao-texto"><div class="configuracao-opcao-titulo">Confirmar antes de excluir</div><div class="configuracao-opcao-descricao">Quando desligado, as confirmações de exclusão são puladas.</div></div>
+<div class="configuracao-controle"><label class="configuracao-toggle" aria-label="Confirmar antes de excluir"><input id="preferenciaConfirmarExclusao" type="checkbox" onchange="alterarPreferenciaConfirmarExclusao(this.checked)"><span class="configuracao-toggle-slider"></span></label></div>
+</div>
+
+<div class="configuracao-opcao">
+<div class="configuracao-opcao-texto"><div class="configuracao-opcao-titulo">Mostrar dicas</div><div class="configuracao-opcao-descricao">Mostra os textos introdutórios e avisos explicativos das telas.</div></div>
+<div class="configuracao-controle"><label class="configuracao-toggle" aria-label="Mostrar dicas"><input id="preferenciaMostrarDicas" type="checkbox" onchange="alterarPreferenciaMostrarDicas(this.checked)"><span class="configuracao-toggle-slider"></span></label></div>
+</div>
+</div>
+
+<div class="card" style="margin-top:10px">
 <div class="titulo-historia">📥 Importar dados</div>
 <div class="descricao">
 Restaura um backup exportado anteriormente. <b>Isso substitui todos os
@@ -2600,7 +2672,7 @@ mostrarToast("Meta atualizada.")
 function excluirMetaGlobal(jornadaId,faseId,metaId){
 const contexto=localizarMetaGlobal(jornadaId,faseId,metaId);
 if(!contexto)return;
-if(!confirm("Excluir esta meta?"))return;
+if(!confirmarExclusao("Excluir esta meta?"))return;
 if(contexto.meta.concluida)adicionarXP(-(Number(contexto.meta.pontos)||0));
 contexto.fase.metas=contexto.fase.metas.filter(item=>String(item.id)!==String(metaId));
 contexto.fase.atualizadoEm=Date.now();
@@ -3347,7 +3419,7 @@ salvarDiario();diarioEditando=null;buscaDiarioAtual="";mostrarToast("Entrada do 
 function voltarParaDiario(){diarioEditando=null;mostrarTela("diario")}
 function excluirEntradaDiario(id){
 const idExcluir=id!==undefined?id:diarioEditando;const entrada=diario.find(item=>String(item.id)===String(idExcluir));if(!entrada)return;
-const titulo=entrada.titulo&&entrada.titulo.trim()?entrada.titulo:"Sem título";if(!confirm(`Excluir a entrada "${titulo}"? Esta ação não pode ser desfeita.`))return;
+const titulo=entrada.titulo&&entrada.titulo.trim()?entrada.titulo:"Sem título";if(!confirmarExclusao(`Excluir a entrada "${titulo}"? Esta ação não pode ser desfeita.`))return;
 diario=diario.filter(item=>String(item.id)!==String(idExcluir));salvarDiario();diarioEditando=null;mostrarToast("Entrada excluída.");mostrarTela("diario")
 }
 
@@ -3795,6 +3867,23 @@ year:"numeric"
 }
 )
 }
+const CHAVE_PREFERENCIAS="meu_universo_0_1_preferencias";
+const PREFERENCIAS_PADRAO={tema:"claro",tamanhoFonte:"media",corTema:"rosa",densidade:"confortavel",telaInicial:"inicio",confirmarExclusao:true,mostrarDicas:true};
+let preferencias={...PREFERENCIAS_PADRAO};
+function carregarPreferencias(){try{const salvo=JSON.parse(localStorage.getItem(CHAVE_PREFERENCIAS)||"null");preferencias={...PREFERENCIAS_PADRAO,...(salvo&&typeof salvo==="object"?salvo:{})}}catch(erro){preferencias={...PREFERENCIAS_PADRAO};console.warn("Não foi possível carregar preferências:",erro)}aplicarPreferencias();renderizarPreferenciasConfiguracoes()}
+function salvarPreferencias(){localStorage.setItem(CHAVE_PREFERENCIAS,JSON.stringify(preferencias))}
+function aplicarPreferencias(){const b=document.body,d=document.documentElement;if(!b)return;d.style.setProperty("--escala-fonte",preferencias.tamanhoFonte==="pequena"?"14px":preferencias.tamanhoFonte==="grande"?"18px":"16px");b.classList.toggle("tema-escuro",preferencias.tema==="escuro");b.classList.remove("tema-lilas","tema-verde-salvia","tema-azul-cinza");if(preferencias.corTema&&preferencias.corTema!=="rosa")b.classList.add("tema-"+preferencias.corTema);b.classList.toggle("densidade-compacta",preferencias.densidade==="compacta");b.classList.toggle("sem-dicas",preferencias.mostrarDicas===false)}
+function renderizarPreferenciasConfiguracoes(){const a=document.getElementById("preferenciaTemaEscuro"),b=document.getElementById("preferenciaTamanhoFonte"),c=document.getElementById("preferenciaCorTema"),d=document.getElementById("preferenciaDensidade"),e=document.getElementById("preferenciaTelaInicial"),f=document.getElementById("preferenciaConfirmarExclusao"),g=document.getElementById("preferenciaMostrarDicas");if(a)a.checked=preferencias.tema==="escuro";if(b)b.value=preferencias.tamanhoFonte;if(c)c.value=preferencias.corTema;if(d)d.value=preferencias.densidade;if(e)e.value=preferencias.telaInicial;if(f)f.checked=preferencias.confirmarExclusao!==false;if(g)g.checked=preferencias.mostrarDicas!==false}
+function atualizarPreferencia(chave,valor){preferencias[chave]=valor;salvarPreferencias();aplicarPreferencias();renderizarPreferenciasConfiguracoes()}
+function alterarPreferenciaTema(escuro){atualizarPreferencia("tema",escuro?"escuro":"claro")}
+function alterarPreferenciaTamanhoFonte(valor){atualizarPreferencia("tamanhoFonte",valor)}
+function alterarPreferenciaCorTema(valor){atualizarPreferencia("corTema",valor)}
+function alterarPreferenciaDensidade(valor){atualizarPreferencia("densidade",valor)}
+function alterarPreferenciaTelaInicial(valor){atualizarPreferencia("telaInicial",valor)}
+function alterarPreferenciaConfirmarExclusao(valor){atualizarPreferencia("confirmarExclusao",!!valor)}
+function alterarPreferenciaMostrarDicas(valor){atualizarPreferencia("mostrarDicas",!!valor)}
+function confirmarExclusao(mensagem){return preferencias.confirmarExclusao!==false?confirm(mensagem):true}
+
 function mostrarTela(id,viaHistorico){
 if(!viaHistorico){
 try{
@@ -3824,6 +3913,8 @@ b.dataset.tela===id
 );
 if(id==="inicio")
 renderizarInicio();
+if(id==="configuracoes")
+renderizarPreferenciasConfiguracoes();
 if(id==="historias")
 renderizarHistorias();
 if(id==="universos"){
@@ -5074,7 +5165,7 @@ capitulo.titulo.trim()?
 capitulo.titulo:
 "Sem título";
 const confirmou=
-confirm(
+confirmarExclusao(
 `Excluir o capítulo "${titulo}"? Esta ação não pode ser desfeita.`
 );
 if(!confirmou)return;
@@ -5822,7 +5913,7 @@ personagem.nome.trim()?
 personagem.nome:
 "Sem nome";
 const confirmou=
-confirm(
+confirmarExclusao(
 `Excluir o personagem "${nome}"? Esta ação não pode ser desfeita.`
 );
 if(!confirmou)return;
@@ -5952,7 +6043,7 @@ const relacionamento=personagem.relacionamentos.find(item=>String(item.id)===Str
 if(!relacionamento)return;
 const outro=historia.personagens.find(item=>String(item.id)===String(relacionamento.personagemRelacionadoId));
 const nomeOutro=outro?.nome?.trim()||"personagem";
-if(!confirm(`Remover o relacionamento com "${nomeOutro}"?`))return;
+if(!confirmarExclusao(`Remover o relacionamento com "${nomeOutro}"?`))return;
 personagem.relacionamentos=personagem.relacionamentos.filter(item=>String(item.id)!==String(idRelacionamento));
 const agora=Date.now();
 personagem.atualizadoEm=agora;
@@ -7246,7 +7337,7 @@ local.nome.trim()?
 local.nome:
 "Sem nome";
 const confirmou=
-confirm(
+confirmarExclusao(
 `Excluir o local "${nome}"? Esta ação não pode ser desfeita.`
 );
 if(!confirmou)return;
@@ -7299,7 +7390,7 @@ const evento={id:gerarIdEvento(),nome,data,localId,personagensEnvolvidos,consequ
 }
 function voltarParaCronologia(){eventoEditando=null;abaHistoriaAtual="cronologia";mostrarTela("dentroHistoria")}
 function cancelarEvento(){voltarParaCronologia()}
-function excluirEvento(){const historia=historias.find(item=>String(item.id)===String(historiaAberta));if(!historia||!Array.isArray(historia.eventos))return;const evento=historia.eventos.find(item=>String(item.id)===String(eventoEditando));if(!evento)return;const nome=evento.nome&&evento.nome.trim()?evento.nome:"Sem nome";if(!confirm(`Excluir o evento "${nome}"? Esta ação não pode ser desfeita.`))return;historia.eventos=historia.eventos.filter(item=>String(item.id)!==String(eventoEditando));historia.atualizadoEm=Date.now();salvarDados();marcarComoRecente(TIPOS_ITEM.HISTORIA,historia.id);eventoEditando=null;abaHistoriaAtual="cronologia";mostrarTela("dentroHistoria");mostrarToast("Evento excluído.")}
+function excluirEvento(){const historia=historias.find(item=>String(item.id)===String(historiaAberta));if(!historia||!Array.isArray(historia.eventos))return;const evento=historia.eventos.find(item=>String(item.id)===String(eventoEditando));if(!evento)return;const nome=evento.nome&&evento.nome.trim()?evento.nome:"Sem nome";if(!confirmarExclusao(`Excluir o evento "${nome}"? Esta ação não pode ser desfeita.`))return;historia.eventos=historia.eventos.filter(item=>String(item.id)!==String(eventoEditando));historia.atualizadoEm=Date.now();salvarDados();marcarComoRecente(TIPOS_ITEM.HISTORIA,historia.id);eventoEditando=null;abaHistoriaAtual="cronologia";mostrarTela("dentroHistoria");mostrarToast("Evento excluído.")}
 function alternarFavoritoHistoriaDetalhe(id){
 alternarFavorito(
 TIPOS_ITEM.HISTORIA,
@@ -7754,7 +7845,7 @@ item=>String(item.id)===String(id)
 );
 if(!historia)return;
 if(
-!confirm(
+!confirmarExclusao(
 `Excluir "${historia.titulo}"? Ela irá para a Lixeira, de onde você pode restaurá-la depois.`
 )
 )return;
@@ -9154,7 +9245,7 @@ const locais=obterLocaisUniverso(universoAberto);
 const local=locais.find(item=>String(item.id)===String(localUniversoEditando));
 if(!local)return;
 const nome=local.nome&&local.nome.trim()?local.nome:"Sem nome";
-if(!confirm(`Excluir o local "${nome}"? Esta ação não pode ser desfeita.`))return;
+if(!confirmarExclusao(`Excluir o local "${nome}"? Esta ação não pode ser desfeita.`))return;
 locaisUniversos[universoAberto]=locais.filter(item=>String(item.id)!==String(local.id));
 salvarLocaisUniversos();
 limparReferenciasEventosUniversoAoExcluirLocal(universoAberto,String(local.id));
@@ -9509,7 +9600,7 @@ const chave=universoAberto;
 const ideias=obterIdeiasUniverso(chave);
 const ideia=ideias.find(item=>String(item.id)===String(ideiaUniversoEditando));
 if(!ideia)return;
-if(!confirm("Excluir esta ideia?"))return;
+if(!confirmarExclusao("Excluir esta ideia?"))return;
 ideiasUniversos[chave]=ideias.filter(item=>String(item.id)!==String(ideia.id));
 salvarIdeiasUniversos();
 ideiaUniversoEditando=null;
@@ -9652,7 +9743,7 @@ const eventos=obterEventosUniverso(universoAberto);
 const evento=eventos.find(item=>String(item.id)===String(eventoUniversoEditando));
 if(!evento)return;
 const nome=evento.nome&&evento.nome.trim()?evento.nome:"Sem nome";
-if(!confirm(`Excluir o evento "${nome}"? Esta ação não pode ser desfeita.`))return;
+if(!confirmarExclusao(`Excluir o evento "${nome}"? Esta ação não pode ser desfeita.`))return;
 eventosUniversos[universoAberto]=eventos.filter(item=>String(item.id)!==String(eventoUniversoEditando));
 salvarEventosUniversos();
 eventoUniversoEditando=null;
@@ -9915,7 +10006,7 @@ const personagens=obterPersonagensUniverso(universoAberto);
 const personagem=personagens.find(item=>String(item.id)===String(personagemUniversoEditando));
 if(!personagem)return;
 const nome=personagem.nome&&personagem.nome.trim()?personagem.nome:"Sem nome";
-if(!confirm(`Excluir o personagem "${nome}"? Esta ação não pode ser desfeita.`))return;
+if(!confirmarExclusao(`Excluir o personagem "${nome}"? Esta ação não pode ser desfeita.`))return;
 const idExcluido=String(personagem.id);
 personagensUniversos[universoAberto]=personagens.filter(item=>String(item.id)!==idExcluido).map(personagemRestante=>({
 ...personagemRestante,
@@ -10952,7 +11043,7 @@ ideia.texto&&ideia.texto.trim()?
 ideia.texto.trim():
 "Ideia sem texto";
 const confirmar=
-confirm(
+confirmarExclusao(
 `Excluir esta ideia?\n\n"${texto}"\n\nEsta ação não pode ser desfeita.`
 );
 if(!confirmar)return;
@@ -11203,7 +11294,7 @@ if(!historia||!Array.isArray(historia.arquivos))return;
 const arquivo=historia.arquivos.find(item=>String(item.id)===String(arquivoEditando));
 if(!arquivo)return;
 const nome=arquivo.nome&&arquivo.nome.trim()?arquivo.nome:"Sem nome";
-if(!confirm(`Excluir a referência "${nome}"? Esta ação não pode ser desfeita.`))return;
+if(!confirmarExclusao(`Excluir a referência "${nome}"? Esta ação não pode ser desfeita.`))return;
 historia.arquivos=historia.arquivos.filter(item=>String(item.id)!==String(arquivoEditando));
 historia.atualizadoEm=Date.now();
 salvarDados();marcarComoRecente(TIPOS_ITEM.HISTORIA,historia.id);
@@ -11677,7 +11768,7 @@ mostrarToast("Jornada salva.")
 function excluirJornada(id){
 const jornada=obterJornada(id);
 if(!jornada)return;
-if(!confirm(`Excluir a jornada "${jornada.nome}"? Esta ação não pode ser desfeita.`))return;
+if(!confirmarExclusao(`Excluir a jornada "${jornada.nome}"? Esta ação não pode ser desfeita.`))return;
 jornadas=jornadas.filter(item=>String(item.id)!==String(id));
 salvarJornadas();
 if(String(jornadaAberta)===String(id))jornadaAberta=null;
@@ -11854,7 +11945,7 @@ const jornada=obterJornada(jornadaAberta);
 if(!jornada)return;
 const fase=obterFase(jornada,id);
 if(!fase)return;
-if(!confirm(`Excluir a fase "${fase.nome}"? Esta ação não pode ser desfeita.`))return;
+if(!confirmarExclusao(`Excluir a fase "${fase.nome}"? Esta ação não pode ser desfeita.`))return;
 jornada.fases=jornada.fases.filter(item=>String(item.id)!==String(id));
 jornada.atualizadoEm=Date.now();
 salvarJornadas();
@@ -11988,7 +12079,7 @@ if(!jornada||!Array.isArray(jornada.recompensas))return;
 const recompensa=jornada.recompensas.find(item=>String(item.id)===String(id));
 if(!recompensa)return;
 if(!recompensaDisponivel(jornada,recompensa))return;
-if(!confirm(`Resgatar a recompensa "${recompensa.nome}"?`))return;
+if(!confirmarExclusao(`Resgatar a recompensa "${recompensa.nome}"?`))return;
 recompensa.resgatada=true;
 recompensa.resgatadaEm=Date.now();
 jornada.atualizadoEm=Date.now();
@@ -12002,7 +12093,7 @@ const jornada=obterJornada(jornadaAberta);
 if(!jornada||!Array.isArray(jornada.recompensas))return;
 const recompensa=jornada.recompensas.find(item=>String(item.id)===String(id));
 if(!recompensa)return;
-if(!confirm(`Excluir a recompensa "${recompensa.nome}"?`))return;
+if(!confirmarExclusao(`Excluir a recompensa "${recompensa.nome}"?`))return;
 jornada.recompensas=jornada.recompensas.filter(item=>String(item.id)!==String(id));
 jornada.atualizadoEm=Date.now();
 salvarJornadas();
@@ -12228,7 +12319,7 @@ const jornada=obterJornada(jornadaAberta);
 if(!jornada)return;
 const fase=obterFase(jornada,faseAberta);
 if(!fase||!Array.isArray(fase.metas))return;
-if(!confirm("Excluir esta meta?"))return;
+if(!confirmarExclusao("Excluir esta meta?"))return;
 const meta=fase.metas.find(item=>String(item.id)===String(id));
 if(meta&&meta.concluida){
 adicionarXP(-(Number(meta.pontos)||0))
@@ -12487,7 +12578,7 @@ function editarLembrete(id){lembreteEditando=id;mostrarTela("editorLembrete")}
 function cancelarLembrete(){lembreteEditando=null;mostrarTela("lembretesPlanner")}
 function renderizarEditorLembrete(){const a=document.getElementById("conteudoEditorLembrete");if(!a)return;const x=lembreteEditando?lembretes.find(i=>String(i.id)===String(lembreteEditando)):null;a.innerHTML=`<button class="btn btn-voltar" onclick="cancelarLembrete()">← Lembretes</button><div class="titulo-pagina">${x?"Editar lembrete":"Novo lembrete"}</div><div class="formulario-jornada" style="margin-top:15px"><label>Título *</label><input id="campoTituloLembrete" type="text" value="${escapar(x?x.titulo:"")}" placeholder="Ex.: Comprar papel"><label>Descrição</label><textarea id="campoDescricaoLembrete">${escapar(x?x.descricao:"")}</textarea><label>Data</label><input id="campoDataLembrete" type="date" value="${x?x.data:""}"><label>Horário</label><input id="campoHoraLembrete" type="time" value="${x?x.hora:""}"><label>Repetição</label><select id="campoRepeticaoLembrete"><option value="nenhuma">Nenhuma</option><option value="diaria">Diária</option><option value="semanal">Semanal</option></select><label>Prioridade</label><select id="campoPrioridadeLembrete"><option>Baixa</option><option selected>Média</option><option>Alta</option></select><label>Atividade relacionada (opcional)</label><select id="campoAtividadeLembrete"><option value="">Nenhuma</option>${atividades.map(i=>`<option value="${escapar(String(i.id))}">${escapar(i.data)} — ${escapar(i.titulo)}</option>`).join("")}</select><div class="acoes-formulario"><button class="btn" onclick="cancelarLembrete()">Cancelar</button><button class="btn btn-principal" onclick="salvarLembrete()">Salvar lembrete</button></div>${x?`<button class="btn btn-perigo" style="width:100%;margin-top:8px" onclick='excluirLembrete(${JSON.stringify(x.id)})'>Excluir lembrete</button>`:""}</div>`;if(x){campoRepeticaoLembrete.value=x.repeticao;campoPrioridadeLembrete.value=x.prioridade;campoAtividadeLembrete.value=x.atividadeId||""}}
 function salvarLembrete(){const titulo=campoTituloLembrete.value.trim();if(!titulo){alert("Digite pelo menos o título do lembrete.");return}const agora=Date.now(),d={titulo,descricao:campoDescricaoLembrete.value.trim(),data:campoDataLembrete.value||"",hora:campoHoraLembrete.value||"",repeticao:campoRepeticaoLembrete.value,prioridade:campoPrioridadeLembrete.value,atividadeId:campoAtividadeLembrete.value||null,atualizadoEm:agora};if(lembreteEditando){const x=lembretes.find(i=>String(i.id)===String(lembreteEditando));if(x)Object.assign(x,d)}else{lembretes.push({id:gerarIdLembrete(),...d,concluido:false,criadoEm:agora})}salvarLembretes();lembreteEditando=null;mostrarTela("lembretesPlanner");mostrarToast("Lembrete salvo.")}
-function excluirLembrete(id){const x=lembretes.find(i=>String(i.id)===String(id));if(!x||!confirm(`Excluir o lembrete "${x.titulo}"?`))return;lembretes=lembretes.filter(i=>String(i.id)!==String(id));salvarLembretes();renderizarLembretesPlanner()}
+function excluirLembrete(id){const x=lembretes.find(i=>String(i.id)===String(id));if(!x||!confirmarExclusao(`Excluir o lembrete "${x.titulo}"?`))return;lembretes=lembretes.filter(i=>String(i.id)!==String(id));salvarLembretes();renderizarLembretesPlanner()}
 function alternarLembrete(id){const x=lembretes.find(i=>String(i.id)===String(id));if(!x)return;x.concluido=!x.concluido;x.atualizadoEm=Date.now();salvarLembretes();renderizarLembretesPlanner()}
 function renderizarLembretesPlanner(){const a=document.getElementById("conteudoLembretesPlanner");if(!a)return;const lista=[...lembretes].sort((x,y)=>((x.data||"9999")+(x.hora||"99")).localeCompare((y.data||"9999")+(y.hora||"99")));a.innerHTML=`<button class="btn btn-voltar" onclick="voltarParaPlanner()">← Planner</button><div class="titulo-pagina">Lembretes</div><p class="texto-intro">Coisas que você precisa lembrar, separadas das atividades.</p><button class="btn btn-principal" style="width:100%" onclick="novaLembrete()">＋ Novo lembrete</button><div style="margin-top:15px">${lista.length?lista.map(x=>`<div class="card lembrete-card ${x.concluido?"concluido":""}"><div style="display:flex;gap:9px"><input type="checkbox" ${x.concluido?"checked":""} onchange='alternarLembrete(${JSON.stringify(x.id)})'><div style="flex:1"><div class="planner-extra-titulo">${escapar(x.titulo)}</div><div class="planner-extra-meta">${escapar(formatarDataHoraExtra(x.data,x.hora))} · ${escapar(x.prioridade)}${x.repeticao&&x.repeticao!=="nenhuma"?" · "+escapar(x.repeticao):""}</div>${x.descricao?`<div class="descricao" style="margin-top:7px">${escapar(x.descricao)}</div>`:""}<div class="planner-extra-acoes"><button class="btn" onclick='editarLembrete(${JSON.stringify(x.id)})'>Editar</button></div></div></div></div>`).join(""):`<div class="card vazio"><h3>Nenhum lembrete.</h3><p>Adicione algo que não quer esquecer.</p></div>`}</div>`}
 function novaFuturo(){futuroEditando=null;mostrarTela("editorFuturo")}
@@ -12495,7 +12586,7 @@ function editarFuturo(id){futuroEditando=id;mostrarTela("editorFuturo")}
 function cancelarFuturo(){futuroEditando=null;mostrarTela("futuroPlanner")}
 function renderizarEditorFuturo(){const a=document.getElementById("conteudoEditorFuturo");if(!a)return;const x=futuroEditando?futuroItens.find(i=>String(i.id)===String(futuroEditando)):null;a.innerHTML=`<button class="btn btn-voltar" onclick="cancelarFuturo()">← Futuro</button><div class="titulo-pagina">${x?"Editar item do Futuro":"Novo item para o Futuro"}</div><p class="texto-intro">Guarde o que você quer fazer algum dia, sem precisar decidir quando agora.</p><div class="formulario-jornada" style="margin-top:15px"><label>Título *</label><input id="campoTituloFuturo" type="text" value="${escapar(x?x.titulo:"")}" placeholder="Ex.: Aprender desenho digital"><label>Tipo</label><select id="campoTipoFuturo"><option>Fazer</option><option>Aprender</option><option>Escrever/Criar</option></select><label>Descrição</label><textarea id="campoDescricaoFuturo">${escapar(x?x.descricao:"")}</textarea><label>Prioridade</label><select id="campoPrioridadeFuturo"><option>Baixa</option><option selected>Média</option><option>Alta</option></select><label>Tags</label><input id="campoTagsFuturo" type="text" value="${escapar(x?(x.tags||[]).join(", "):"")}" placeholder="estudo, escrita"><label>Status</label><select id="campoStatusFuturo"><option>Guardado</option><option>Planejar depois</option><option>Transformado em atividade</option><option>Concluído</option><option>Arquivado</option></select><div class="acoes-formulario"><button class="btn" onclick="cancelarFuturo()">Cancelar</button><button class="btn btn-principal" onclick="salvarFuturoItem()">Salvar</button></div>${x?`<button class="btn btn-perigo" style="width:100%;margin-top:8px" onclick='excluirFuturo(${JSON.stringify(x.id)})'>Excluir item</button>`:""}</div>`;if(x){campoTipoFuturo.value=x.tipo;campoPrioridadeFuturo.value=x.prioridade;campoStatusFuturo.value=x.status}}
 function salvarFuturoItem(){const titulo=campoTituloFuturo.value.trim();if(!titulo){alert("Digite pelo menos o título.");return}const agora=Date.now(),d={titulo,tipo:campoTipoFuturo.value,descricao:campoDescricaoFuturo.value.trim(),prioridade:campoPrioridadeFuturo.value,tags:campoTagsFuturo.value.split(",").map(x=>x.trim()).filter(Boolean),status:campoStatusFuturo.value,atualizadoEm:agora};if(futuroEditando){const x=futuroItens.find(i=>String(i.id)===String(futuroEditando));if(x)Object.assign(x,d)}else{futuroItens.push({id:gerarIdFuturo(),...d,criadoEm:agora})}salvarFuturo();futuroEditando=null;mostrarTela("futuroPlanner");mostrarToast("Item salvo no Futuro.")}
-function excluirFuturo(id){const x=futuroItens.find(i=>String(i.id)===String(id));if(!x||!confirm(`Excluir "${x.titulo}" do Futuro?`))return;futuroItens=futuroItens.filter(i=>String(i.id)!==String(id));salvarFuturo();renderizarFuturoPlanner()}
+function excluirFuturo(id){const x=futuroItens.find(i=>String(i.id)===String(id));if(!x||!confirmarExclusao(`Excluir "${x.titulo}" do Futuro?`))return;futuroItens=futuroItens.filter(i=>String(i.id)!==String(id));salvarFuturo();renderizarFuturoPlanner()}
 function definirFiltroFuturo(filtro){filtroFuturoAtual=filtro;renderizarFuturoPlanner()}
 function transformarFuturoEmAtividade(id){const x=futuroItens.find(i=>String(i.id)===String(id));if(!x)return;atividadeEditando=null;dataPlannerAtual=obterDataHojeISO();mostrarTela("editorAtividade");setTimeout(()=>{if(campoTituloAtividade)campoTituloAtividade.value=x.titulo;if(campoObservacoesAtividade)campoObservacoesAtividade.value=x.descricao;if(campoDataAtividade)campoDataAtividade.value=dataPlannerAtual},0);x.status="Transformado em atividade";x.atualizadoEm=Date.now();salvarFuturo()}
 function renderizarFuturoPlanner(){const a=document.getElementById("conteudoFuturoPlanner");if(!a)return;const tipos=["todos","Fazer","Aprender","Escrever/Criar"],lista=filtroFuturoAtual==="todos"?futuroItens:futuroItens.filter(x=>x.tipo===filtroFuturoAtual);a.innerHTML=`<button class="btn btn-voltar" onclick="voltarParaPlanner()">← Planner</button><div class="titulo-pagina">Futuro</div><p class="texto-intro">Coisas que você quer fazer algum dia, mas ainda não decidiu quando.</p><button class="btn btn-principal" style="width:100%" onclick="novaFuturo()">＋ Novo item</button><div class="planner-extra-filtros">${tipos.map(x=>`<button class="planner-extra-filtro ${filtroFuturoAtual===x?"ativo":""}" onclick='definirFiltroFuturo(${JSON.stringify(x)})'>${x==="todos"?"Todos":x}</button>`).join("")}</div>${lista.length?[...lista].sort((x,y)=>y.atualizadoEm-x.atualizadoEm).map(x=>`<div class="card futuro-card"><span class="futuro-tipo">${escapar(x.tipo)}</span><div class="planner-extra-titulo">${escapar(x.titulo)}</div>${x.descricao?`<div class="descricao" style="margin-top:7px">${escapar(x.descricao)}</div>`:""}<div class="planner-extra-meta">Prioridade ${escapar(x.prioridade)} · ${escapar(x.status)}</div>${x.tags&&x.tags.length?`<div class="meta" style="margin-top:7px">${x.tags.map(t=>"#"+escapar(t)).join(" ")}</div>`:""}<div class="planner-extra-acoes"><button class="btn" onclick='editarFuturo(${JSON.stringify(x.id)})'>Editar</button>${x.status!=="Transformado em atividade"?`<button class="btn" onclick='transformarFuturoEmAtividade(${JSON.stringify(x.id)})'>Planejar</button>`:""}</div></div>`).join(""):`<div class="card vazio"><h3>Nada guardado no Futuro.</h3><p>Adicione algo para não precisar decidir tudo agora.</p></div>`}`}
@@ -12635,9 +12726,9 @@ mostrarToast("Atividade salva.")
 function excluirAtividade(id){
 const atividade=atividades.find(item=>String(item.id)===String(id));
 if(!atividade)return;
-if(!confirm(`Excluir a atividade "${atividade.titulo}"?`))return;
+if(!confirmarExclusao(`Excluir a atividade "${atividade.titulo}"?`))return;
 if(atividade.serieId){
-const excluirFuturas=confirm(
+const excluirFuturas=confirmarExclusao(
 "Essa atividade faz parte de uma repetição. Toque OK para excluir também as ocorrências futuras dessa série, ou Cancelar para excluir só essa."
 );
 if(excluirFuturas){
@@ -12926,7 +13017,7 @@ renderizarEditorProjeto()
 function excluirTarefaProjeto(id){
 const projeto=obterProjeto(projetoEditando);
 if(!projeto||!Array.isArray(projeto.tarefas))return;
-if(!confirm("Excluir esta tarefa?"))return;
+if(!confirmarExclusao("Excluir esta tarefa?"))return;
 projeto.tarefas=projeto.tarefas.filter(item=>String(item.id)!==String(id));
 projeto.atualizadoEm=Date.now();
 salvarProjetos();
@@ -12986,7 +13077,7 @@ const projeto=obterProjeto(projetoEditando);
 if(!projeto||!Array.isArray(projeto.ideias))return;
 const ideia=projeto.ideias.find(item=>String(item.id)===String(id));
 if(!ideia)return;
-if(!confirm(`Excluir a ideia "${ideia.titulo||"Sem título"}"?`))return;
+if(!confirmarExclusao(`Excluir a ideia "${ideia.titulo||"Sem título"}"?`))return;
 projeto.ideias=projeto.ideias.filter(item=>String(item.id)!==String(id));
 projeto.atualizadoEm=Date.now();
 salvarProjetos();
@@ -13089,7 +13180,7 @@ mostrarToast("Projeto salvo.")
 function excluirProjeto(id){
 const projeto=obterProjeto(id);
 if(!projeto)return;
-if(!confirm(`Excluir o projeto "${projeto.nome}"?`))return;
+if(!confirmarExclusao(`Excluir o projeto "${projeto.nome}"?`))return;
 projetos=projetos.filter(item=>String(item.id)!==String(id));
 salvarProjetos();
 projetoEditando=null;
@@ -13322,7 +13413,7 @@ mostrarToast("História restaurada.")
 function excluirHistoriaDefinitivamente(id){
 const historia=lixeiraHistorias.find(item=>String(item.id)===String(id));
 if(!historia)return;
-if(!confirm(`Excluir "${historia.titulo}" definitivamente? Esta ação não pode ser desfeita.`))return;
+if(!confirmarExclusao(`Excluir "${historia.titulo}" definitivamente? Esta ação não pode ser desfeita.`))return;
 lixeiraHistorias=lixeiraHistorias.filter(item=>String(item.id)!==String(id));
 delete estadoItens[criarChaveItem(TIPOS_ITEM.HISTORIA,id)];
 salvarLixeiraHistorias();
@@ -13565,7 +13656,7 @@ function gerarIdPDFBiblioteca(){return String(Date.now())+"-pdf-"+Math.random().
 function formatarTamanhoArquivo(bytes){const n=Number(bytes)||0;if(n<1024)return `${n} B`;if(n<1024*1024)return `${(n/1024).toFixed(1)} KB`;return `${(n/(1024*1024)).toFixed(1)} MB`}
 async function renderizarBiblioteca(){const lista=document.getElementById("listaBiblioteca");if(!lista)return;try{const itens=(await listarPDFsBiblioteca()).sort((a,b)=>(Number(b.atualizadoEm)||0)-(Number(a.atualizadoEm)||0));if(!itens.length){lista.innerHTML=`<div class="card vazio"><div class="ilustracao" aria-hidden="true">📖</div><h3>Sua Biblioteca está vazia.</h3><p>Adicione um PDF para começar a leitura.</p></div>`;return}lista.innerHTML=itens.map(i=>`<article class="card-livro"><div class="card-livro-titulo">📄 ${escapar(i.titulo||i.nomeArquivo)}</div><div class="card-livro-meta">${formatarTamanhoArquivo(i.tamanho)} · Página ${Number(i.ultimaPagina)||1}${i.autor?` · ${escapar(i.autor)}`:""}${i.idioma?` · ${escapar(i.idioma)}`:""}</div><div class="pdf-biblioteca-acoes"><button class="btn btn-principal" onclick='abrirPDFBiblioteca(${JSON.stringify(i.id)})'>📖 Ler</button><button class="btn" onclick='editarMetadadosPDF(${JSON.stringify(i.id)})'>Informações</button><button class="btn btn-perigo" onclick='removerPDFBiblioteca(${JSON.stringify(i.id)})'>Excluir</button></div></article>`).join("")}catch(erro){console.error(erro);lista.innerHTML=`<div class="card vazio"><h3>Não foi possível abrir a Biblioteca.</h3><p>O armazenamento local de arquivos não está disponível neste navegador.</p></div>`}}
 async function editarMetadadosPDF(id){const item=await obterPDFBiblioteca(id);if(!item)return;const titulo=prompt("Título do livro:",item.titulo||"");if(titulo===null)return;const autor=prompt("Autor (opcional):",item.autor||"");if(autor===null)return;const idioma=prompt("Idioma (opcional):",item.idioma||"");if(idioma===null)return;item.titulo=titulo.trim()||item.titulo;item.autor=autor.trim();item.idioma=idioma.trim();await atualizarPDFBiblioteca(item);renderizarBiblioteca();mostrarToast("Informações atualizadas.")}
-async function removerPDFBiblioteca(id){const item=await obterPDFBiblioteca(id);if(!item)return;if(!confirm(`Excluir "${item.titulo||item.nomeArquivo}" da Biblioteca?`))return;await excluirPDFBiblioteca(id);if(pdfAberto===id){fecharLeitorPDF()}renderizarBiblioteca();mostrarToast("Livro removido da Biblioteca.")}
+async function removerPDFBiblioteca(id){const item=await obterPDFBiblioteca(id);if(!item)return;if(!confirmarExclusao(`Excluir "${item.titulo||item.nomeArquivo}" da Biblioteca?`))return;await excluirPDFBiblioteca(id);if(pdfAberto===id){fecharLeitorPDF()}renderizarBiblioteca();mostrarToast("Livro removido da Biblioteca.")}
 async function abrirPDFBiblioteca(id){const item=await obterPDFBiblioteca(id);if(!item)return;pdfAberto=id;pdfPaginaAtual=Math.max(1,Number(item.ultimaPagina)||1);pdfTextoPaginaAtual="";pdfTextoTraducao="";mostrarTela("leitorPDF");setTimeout(()=>carregarPDFNoLeitor(item),50)}
 async function carregarPDFNoLeitor(item){const area=document.getElementById("conteudoLeitorPDF");if(!area)return;if(pdfUrlAtual){URL.revokeObjectURL(pdfUrlAtual);pdfUrlAtual=null}const blob=item.blob;pdfUrlAtual=URL.createObjectURL(blob);area.innerHTML=`<div class="pdf-leitor-cabecalho"><button class="btn btn-voltar" onclick="fecharLeitorPDF()">← Biblioteca</button><div><b>${escapar(item.titulo||item.nomeArquivo)}</b><div class="card-livro-meta">${item.autor?escapar(item.autor):""}</div></div></div><div class="pdf-controles"><button class="btn" onclick="mudarPaginaPDF(-1)">← Anterior</button><input id="campoPaginaPDF" type="number" min="1" value="${pdfPaginaAtual}" onchange="irParaPaginaPDF()"><button class="btn" onclick="mudarPaginaPDF(1)">Próxima →</button><button class="btn" onclick="abrirPDFTelaCheia()">⛶ Tela cheia</button></div><div id="framePDFLeitor" class="pdf-frame" title="Leitor de PDF"><div id="pdfPaginaRenderizada" class="pdf-pagina-renderizada"></div></div><div class="card pdf-traducao"><h3 style="font-family:Georgia,serif;margin-top:0">Tradução opcional</h3><div class="texto-intro">A tradução não substitui o original. Use-a quando quiser, por linha/trecho, por página ou lado a lado.</div><div class="pdf-traducao-opcoes" style="margin-top:10px"><button class="btn" onclick="definirModoTraducaoPDF('original')">Original</button><button class="btn" onclick="traduzirTrechoPDF()">Traduzir linha/trecho</button><button class="btn" onclick="traduzirPaginaPDF()">Traduzir página</button><button class="btn" onclick="definirModoTraducaoPDF('ambos')">Original + tradução</button></div><div id="painelTrechoPDF" style="margin-top:10px"><label for="campoTrechoPDF">Trecho/linha</label><textarea id="campoTrechoPDF" placeholder="Digite ou cole um trecho curto para traduzir."></textarea></div><div id="resultadoTraducaoPDF" class="pdf-traducao-resultado pdf-oculto"></div></div>`;try{if(!window.pdfjsLib)throw new Error("PDF.js indisponível");const buffer=await blob.arrayBuffer();pdfDocumentoAtual=await pdfjsLib.getDocument({data:buffer}).promise;pdfTotalPaginas=pdfDocumentoAtual.numPages;atualizarControlesPDF();await renderizarPaginaPDF(pdfPaginaAtual);await extrairTextoPaginaPDF(pdfPaginaAtual)}catch(erro){console.warn("PDF.js indisponível ou não conseguiu ler o PDF:",erro);pdfDocumentoAtual=null;pdfTotalPaginas=0;const pagina=document.getElementById("pdfPaginaRenderizada");if(pagina)pagina.innerHTML=`<div class="card vazio"><h3>Não foi possível carregar este PDF.</h3><p>O arquivo foi selecionado, mas o leitor não conseguiu processá-lo.</p></div>`;atualizarControlesPDF()}}
 function atualizarControlesPDF(){const campo=document.getElementById("campoPaginaPDF");if(campo){campo.max=pdfTotalPaginas||"";campo.value=pdfPaginaAtual}}
@@ -13786,7 +13877,7 @@ if(!pacote||typeof pacote!=="object"||!pacote.dados||typeof pacote.dados!=="obje
 alert("Isso não parece ser um backup válido deste app.");
 return false
 }
-const confirmou=confirm(
+const confirmou=confirmarExclusao(
 "Restaurar esse backup vai substituir TODOS os dados atuais do app (histórias, universos, jornadas, pontos, tudo). Essa ação não pode ser desfeita. Deseja continuar?"
 );
 if(!confirmou)return false;
@@ -13893,9 +13984,11 @@ carregarProjetos();
 carregarLixeiraHistorias();
 carregarDiario();
 carregarDados();
+carregarPreferencias();
 renderizarTudo();
-atualizarBotaoFlutuante("inicio");
-atualizarBotaoSecundario("inicio");
+mostrarTela(preferencias.telaInicial||"inicio",true);
+atualizarBotaoFlutuante(preferencias.telaInicial||"inicio");
+atualizarBotaoSecundario(preferencias.telaInicial||"inicio");
 setTimeout(function(){
 const telaAbertura=document.getElementById("telaAbertura");
 if(telaAbertura){
