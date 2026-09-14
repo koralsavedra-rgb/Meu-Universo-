@@ -13673,67 +13673,63 @@ renderizarBiblioteca()
    ========================================================= */
 
 async function exportarDados(){
-const dados={};
-CHAVES_BACKUP.forEach(chave=>{
-const valor=localStorage.getItem(chave);
-if(valor!==null)dados[chave]=valor
-});
-const pacote={
-app:"meu_universo_backup",
-versao:1,
-criadoEm:Date.now(),
-dados
-};
-const conteudo=JSON.stringify(pacote,null,2);
-const dataFormatada=new Date().toISOString().slice(0,10);
-const nomeArquivo=`meu-universo-backup-${dataFormatada}.json`;
-try{
-const arquivo=new File([conteudo],nomeArquivo,{type:"application/json"});
-if(navigator.canShare&&navigator.canShare({files:[arquivo]})){
-try{
-await navigator.share({
-files:[arquivo],
-title:"Backup Meu Universo",
-text:"Backup dos dados do Meu Universo"
-});
-mostrarToast("Backup compartilhado.");
-return
-}catch(erroCompartilhar){
-if(erroCompartilhar&&erroCompartilhar.name==="AbortError"){
-return
+ const dados={};
+ CHAVES_BACKUP.forEach(chave=>{
+ const valor=localStorage.getItem(chave);
+ if(valor!==null)dados[chave]=valor
+ });
+ const pacote={
+ app:"meu_universo_backup",
+ versao:1,
+ criadoEm:Date.now(),
+ dados
+ };
+ const conteudo=JSON.stringify(pacote,null,2);
+ const dataFormatada=new Date().toISOString().slice(0,10);
+ const nomeArquivo=`meu-universo-backup-${dataFormatada}.json`;
+ 
+ // 1. Tentar compartilhar o arquivo diretamente.
+ try{
+ const arquivo=new File([conteudo],nomeArquivo,{type:"application/json"});
+ if(navigator.canShare&&navigator.canShare({files:[arquivo]})){
+ try{
+ await navigator.share({
+ files:[arquivo],
+ title:"Backup Meu Universo",
+ text:"Backup dos dados do Meu Universo"
+ });
+ mostrarToast("Backup compartilhado.");
+ return
+ }catch(erroCompartilharArquivo){
+ if(erroCompartilharArquivo&&erroCompartilharArquivo.name==="AbortError")return;
+ console.error("Não foi possível compartilhar o arquivo diretamente:",erroCompartilharArquivo)
+ }
+ }
+ }catch(erroArquivo){
+ console.error("Não foi possível preparar o arquivo de backup:",erroArquivo)
+ }
+ 
+ // 2. Se o compartilhamento de arquivo não funcionar, tentar compartilhar apenas o texto.
+ try{
+ if(navigator.share){
+ await navigator.share({
+ text:conteudo,
+ title:"Backup Meu Universo"
+ });
+ mostrarToast("Backup compartilhado.");
+ return
+ }
+ }catch(erroCompartilharTexto){
+ if(erroCompartilharTexto&&erroCompartilharTexto.name==="AbortError")return;
+ console.error("Não foi possível compartilhar o backup como texto:",erroCompartilharTexto)
+ }
+ 
+ // 3. Último recurso: mostrar o backup para copiar/colar.
+ if(conteudo.length>150000){
+ mostrarToast("Backup grande: prefira baixar o arquivo em vez de copiar e colar.");
+ }
+ mostrarBackupParaCopiar(conteudo)
 }
-console.error("Não foi possível compartilhar o arquivo diretamente:",erroCompartilhar)
-}
-}
-}catch(erroArquivo){
-console.error("Não foi possível preparar o arquivo de backup:",erroArquivo)
-}
-
-if(conteudo.length>150000){
-mostrarToast("Backup grande: prefira baixar o arquivo em vez de copiar e colar.");
-}
-
-try{
-const blob=new Blob([conteudo],{type:"application/json;charset=utf-8"});
-const url=URL.createObjectURL(blob);
-const link=document.createElement("a");
-link.href=url;
-link.download=nomeArquivo;
-link.style.display="none";
-document.body.appendChild(link);
-link.click();
-setTimeout(()=>{
-link.remove();
-URL.revokeObjectURL(url);
-},1000);
-mostrarToast("Backup baixado.");
-return
-}catch(erroDownload){
-console.error("Não foi possível baixar o arquivo de backup:",erroDownload)
-}
-mostrarBackupParaCopiar(conteudo)
-}
-
 function mostrarBackupParaCopiar(conteudo){
 const area=document.getElementById("areaBackupTexto");
 const container=document.getElementById("containerBackupTexto");
