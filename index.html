@@ -286,6 +286,32 @@ font-size:10px;
 color:var(--texto-suave);
 min-height:15px
 }
+/* Etapa 3 — marcações do processo de escrita */
+.painel-marcacoes-capitulo{display:none;position:fixed;right:12px;bottom:calc(332px + env(safe-area-inset-bottom,0px));z-index:47;width:min(360px,calc(100vw - 24px));padding:12px;border:1px solid var(--linha);border-radius:16px;background:var(--branco);box-shadow:0 10px 28px rgba(23,21,25,.18)}
+.painel-marcacoes-capitulo.aberto{display:block}
+.painel-marcacoes-titulo{font-weight:700;margin-bottom:9px}
+.painel-marcacoes-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.btn-marcacao-capitulo{border:1px solid var(--linha);border-radius:12px;background:var(--fundo);padding:9px 8px;text-align:left;font:inherit;cursor:pointer}
+.btn-marcacao-capitulo:active{transform:scale(.98)}
+.marcacao-processo{border-bottom:2px solid currentColor;border-radius:2px;position:relative;font-weight:inherit}
+.marcacao-processo.marcacao-observacao{background:rgba(217,154,154,.22);color:#9b4d67}
+.marcacao-processo.marcacao-nota{background:rgba(156,175,136,.24);color:#587044}
+.marcacao-processo.marcacao-revisar{background:rgba(233,201,107,.28);color:#8a6b12}
+.marcacao-processo.marcacao-pesquisar{background:rgba(201,130,104,.22);color:#8b4d38}
+.marcacao-processo.marcacao-alterar{background:rgba(140,150,210,.20);color:#4f5f9a}
+@media(max-width:600px){.painel-marcacoes-capitulo{right:10px;width:calc(100vw - 20px);bottom:calc(330px + env(safe-area-inset-bottom,0px))}}
+.barra-formatacao-capitulo{display:none;position:fixed;right:16px;bottom:calc(272px + env(safe-area-inset-bottom,0px));z-index:45;width:min(390px,calc(100vw - 32px));align-items:center;gap:5px;flex-wrap:wrap;padding:10px;border:1px solid var(--linha);border-radius:16px;background:var(--branco);box-shadow:0 10px 28px rgba(23,21,25,.18)}
+.barra-formatacao-capitulo.aberta{display:flex}
+.btn-ferramenta-editor{min-width:34px;height:34px;padding:0 8px;border:1px solid var(--linha);border-radius:9px;background:var(--branco);color:var(--texto);font-size:14px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation}
+.btn-ferramenta-editor:active{transform:scale(.96);background:var(--rosa-claro)}
+.painel-busca-capitulo{display:none;position:fixed;right:12px;bottom:calc(258px + env(safe-area-inset-bottom,0px));z-index:46;width:min(390px,calc(100vw - 24px));padding:10px;border:1px solid var(--linha);border-radius:16px;background:var(--branco);box-shadow:0 10px 28px rgba(23,21,25,.18)}
+.painel-busca-capitulo.aberto{display:block}
+.busca-capitulo-linha{display:flex;gap:7px;align-items:center}.busca-capitulo-linha input{flex:1;min-width:0;margin:0}.busca-capitulo-resultado{font-size:10px;color:var(--texto-suave);margin-top:7px}.marca-busca-capitulo{background:var(--amarelo);color:inherit;border-radius:3px;padding:0 1px}
+
+.separador-ferramentas-editor{width:1px;height:24px;background:var(--linha);margin:0 2px}
+.campo-texto-capitulo{min-height:55vh;padding:22px 18px;outline:none;background:var(--branco);color:var(--texto);font-family:Georgia,serif;font-size:17px;line-height:1.75;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+.campo-texto-capitulo:empty:before{content:attr(data-placeholder);color:var(--texto-suave);pointer-events:none}
+.campo-texto-capitulo p{margin:0 0 1em}.campo-texto-capitulo div{margin:0}.campo-texto-capitulo[style*="text-align:center"],.campo-texto-capitulo div[style*="text-align:center"],.campo-texto-capitulo p[style*="text-align:center"]{text-align:center}
 .editor-capitulo-card{
 background:white;
 border:1px solid var(--linha);
@@ -314,18 +340,21 @@ border-bottom:1px solid var(--linha)
 }
 #campoTextoCapitulo{
 min-height:calc(100vh - 250px);
-height:calc(100vh - 250px);
+height:auto;
 font-family:Georgia,serif;
 font-size:17px;
 line-height:1.8;
 resize:none;
 border:0;
 background:transparent;
-padding:12px 0 30px;
+padding:12px 0 42px;
 box-shadow:none;
 outline:none;
 width:100%;
-box-sizing:border-box
+box-sizing:border-box;
+overflow:visible;
+word-break:normal;
+overflow-wrap:anywhere;
 }
 #campoTextoCapitulo:focus{
 outline:none;
@@ -383,18 +412,33 @@ color:var(--texto-suave);
 margin:0 0 10px;
 text-align:right
 }
-@media (max-width:700px){
-.editor-escrita-limpa{padding:0 2px}
-#campoTextoCapitulo{min-height:calc(100vh - 210px);height:calc(100vh - 210px);font-size:16px;line-height:1.75}
-.editor-titulo-interativo,.campo-titulo-inline{font-size:25px}
-}
 .editor-acoes{
 display:flex;
 gap:7px;
-margin-top:14px
+margin:10px 0 28px;
+padding-top:10px;
+border-top:1px solid var(--linha)
 }
 .editor-acoes .btn{
 flex:1
+}
+.editor-ferramentas-info{font-size:10px;color:var(--texto-suave);margin:0 0 7px}
+.btn-ferramentas-capitulo{position:fixed!important;right:22px;bottom:calc(210px + env(safe-area-inset-bottom,0px));z-index:40}
+.livro-capitulo-card{display:block;width:100%;text-align:left;border:1px solid var(--linha);background:var(--branco);color:var(--texto);border-radius:18px;padding:16px;margin-bottom:9px;box-shadow:0 5px 18px rgba(23,21,25,.035);cursor:pointer}
+.livro-capitulo-card:active{transform:scale(.99);background:var(--rosa-claro)}
+.livro-capitulo-card-numero{font-size:10px;color:var(--rosa);font-weight:700;letter-spacing:1px}
+.livro-capitulo-card-titulo{font-family:Georgia,serif;font-size:19px;font-weight:600;line-height:1.25;margin-top:4px}
+.livro-capitulo-card-meta{font-size:10px;color:var(--texto-suave);margin-top:6px}
+.livro-leitura-cabecalho{margin-bottom:18px}
+.livro-leitura-texto{font-family:Georgia,serif;line-height:1.8;font-size:17px;white-space:normal;word-break:normal;overflow-wrap:anywhere}
+.livro-leitura-texto p{margin:0 0 1em}
+.livro-leitura-texto div{margin:0}
+@media (max-width:700px){
+.barra-formatacao-capitulo{right:12px;width:calc(100vw - 24px);padding:9px;bottom:calc(272px + env(safe-area-inset-bottom,0px))}
+.editor-escrita-limpa{padding:0 2px}
+#campoTextoCapitulo{min-height:calc(100vh - 210px);height:auto;font-size:16px;line-height:1.75;padding-bottom:52px}
+.editor-titulo-interativo,.campo-titulo-inline{font-size:25px}
+.livro-leitura-texto{font-size:16px;line-height:1.75}
 }
 .aviso-autosalvamento{
 margin-top:9px;
@@ -1476,9 +1520,11 @@ min-width:120px
 .pdf-leitor-cabecalho{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .pdf-controles{display:grid;grid-template-columns:auto 1fr auto auto;gap:7px;align-items:center;margin-bottom:10px}
 .pdf-controles input{min-width:70px;text-align:center}
-.pdf-frame{width:100%;height:70vh;min-height:520px;border:1px solid var(--linha);border-radius:14px;background:#eee;overflow:auto}
+.pdf-frame{width:100%;height:70vh;min-height:520px;border:1px solid var(--linha);border-radius:14px;background:#eee;overflow:auto}.pdf-leitor-fullscreen{position:fixed!important;inset:0!important;z-index:99999!important;width:100vw!important;height:100dvh!important;min-height:100dvh!important;margin:0!important;padding:0!important;background:#eee!important;overflow:auto!important;border:0!important;border-radius:0!important;display:block!important}.pdf-leitor-fullscreen .pdf-pagina-renderizada{width:max-content;min-width:100%;min-height:100%;padding:0;box-sizing:border-box;display:flex;align-items:flex-start;justify-content:center;overflow:visible}.pdf-leitor-fullscreen .pdf-canvas{max-width:none;flex:0 0 auto}
+.pdf-leitor-fullscreen .pdf-canvas.pdf-trocando-pagina{animation:pdfTrocaPagina .16s ease-out}@keyframes pdfTrocaPagina{from{opacity:.35;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}.pdf-saida-fullscreen{position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:100000;display:none!important;background:rgba(255,255,255,.94);box-shadow:0 2px 12px rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:999px;padding:10px 14px;font-weight:700}.pdf-leitor-fullscreen .pdf-saida-fullscreen{display:block!important}
 .pdf-pagina-renderizada{width:100%;min-height:100%;display:flex;align-items:flex-start;justify-content:center;padding:14px;box-sizing:border-box}
-.pdf-canvas{display:block;max-width:100%;height:auto;box-shadow:0 2px 10px rgba(0,0,0,.12);background:#fff}
+.pdf-canvas{display:block;max-width:100%;height:auto;box-shadow:0 2px 10px rgba(0,0,0,.12);background:#fff;image-rendering:auto}
+.pdf-leitor-fullscreen .pdf-canvas{touch-action:pan-x;cursor:default}.pdf-leitor-fullscreen .pdf-pagina-renderizada{touch-action:pan-x}
 .pdf-carregando{padding:30px;text-align:center;color:var(--texto-suave)}
 .pdf-traducao{margin-top:12px}
 .pdf-traducao-opcoes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -1486,8 +1532,34 @@ min-width:120px
 .pdf-oculto{display:none}
 @media(max-width:600px){.leitura-subareas{grid-template-columns:1fr}.livro-capa-titulo{font-size:28px}.livro-folha{padding:22px 17px}.livro-texto{font-size:16px}.pdf-controles{grid-template-columns:1fr 1fr}.pdf-controles button{width:100%}.pdf-frame{height:65vh;min-height:430px}.pdf-traducao-opcoes{grid-template-columns:1fr}}
 
+
+
+/* Mantém o botão de ferramentas acima do teclado virtual no Android. */
+@supports (bottom: env(safe-area-inset-bottom)) {
+  #botaoFlutuanteSecundario.btn-ferramentas-capitulo {
+    bottom: calc(210px + env(safe-area-inset-bottom, 0px));
+  }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style id="cores-marcacoes-revisao">
+/* Etapa 3 — cada tipo de marcação possui uma cor própria para não se confundir com o texto */
+.marcacao-revisao[data-tipo="observacao"] { background: rgba(233, 201, 107, .28) !important; border-bottom: 2px solid #B8860B !important; }
+.marcacao-revisao[data-tipo="nota"] { background: rgba(217, 154, 154, .28) !important; border-bottom: 2px solid #B56B75 !important; }
+.marcacao-revisao[data-tipo="revisar"] { background: rgba(201, 130, 104, .25) !important; border-bottom: 2px solid #A85C43 !important; }
+.marcacao-revisao[data-tipo="pesquisar"] { background: rgba(156, 175, 136, .30) !important; border-bottom: 2px solid #607A4C !important; }
+.marcacao-revisao[data-tipo="alterar"] { background: rgba(180, 160, 205, .28) !important; border-bottom: 2px solid #795A9B !important; }
+</style>
+
+<style id="ajuste-cores-marcacoes">
+/* Cores aplicadas aos seletores reais usados pelas marcações desta etapa. */
+.marcacao-processo.marcacao-observacao{background:rgba(233,201,107,.34)!important;border-bottom:2px solid #B8860B!important}
+.marcacao-processo.marcacao-nota{background:rgba(217,154,154,.32)!important;border-bottom:2px solid #B56B75!important}
+.marcacao-processo.marcacao-revisar{background:rgba(201,130,104,.30)!important;border-bottom:2px solid #A85C43!important}
+.marcacao-processo.marcacao-pesquisar{background:rgba(156,175,136,.34)!important;border-bottom:2px solid #607A4C!important}
+.marcacao-processo.marcacao-alterar{background:rgba(180,160,205,.34)!important;border-bottom:2px solid #795A9B!important}
+</style>
 </head>
 <body>
 <div id="telaAbertura" class="tela-abertura">
@@ -2320,6 +2392,7 @@ let diario=[];
 let diarioEditando=null;
 let buscaDiarioAtual="";
 let livroAberto=null;
+let capituloLivroAberto=null;
 let pdfAberto=null;
 let pdfUrlAtual=null;
 let pdfDocumentoAtual=null;
@@ -3625,14 +3698,44 @@ fab.setAttribute("aria-label",config.label);
 fab.onclick=config.acao
 }
 
+function ajustarBotaoFerramentasTeclado(){
+const fab=document.getElementById("botaoFlutuanteSecundario");
+if(!fab || !fab.classList.contains("btn-ferramentas-capitulo")) return;
+const vv=window.visualViewport;
+let teclado=0;
+if(vv){
+teclado=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+}
+const margem=18;
+const base=210;
+fab.style.bottom=(Math.max(base,teclado+margem))+"px";
+}
+if(window.visualViewport){
+window.visualViewport.addEventListener("resize",ajustarBotaoFerramentasTeclado);
+window.visualViewport.addEventListener("scroll",ajustarBotaoFerramentasTeclado);
+}
+window.addEventListener("resize",ajustarBotaoFerramentasTeclado);
+
 function atualizarBotaoSecundario(id){
 const fab=document.getElementById("botaoFlutuanteSecundario");
 if(!fab)return;
 const telasHistoria=["historias","novaHistoria","dentroHistoria","editorCapitulo","editorPersonagem","editorLocal","editorEvento","editorIdeia","editorArquivo"];
 const telasJornada=["jornadas","conquistas","editorJornada","dentroJornada","editorFase","editorRecompensa"];
+if(id==="editorCapitulo"){
+fab.classList.remove("escondido");
+fab.setAttribute("aria-label","Ferramentas de escrita");
+fab.setAttribute("aria-expanded","false");
+fab.textContent="Aa";
+fab.classList.add("btn-ferramentas-capitulo");
+fab.onclick=function(){alternarFerramentasCapitulo()};
+ajustarBotaoFerramentasTeclado();
+return
+}
 if(telasHistoria.includes(id)){
 fab.classList.remove("escondido");
+fab.classList.remove("btn-ferramentas-capitulo");
 fab.setAttribute("aria-label","Universos");
+fab.setAttribute("aria-expanded","false");
 fab.textContent="☾";
 fab.onclick=function(){mostrarTela("universos")};
 return
@@ -4184,14 +4287,57 @@ area.innerHTML=`
 </div>
 </div>
 <div class="editor-capitulo-card editor-escrita-limpa">
-<textarea id="campoTextoCapitulo" placeholder="Comece a escrever seu capítulo..." oninput="agendarSalvamentoCapitulo();atualizarEstatisticasCapitulo()">${escapar(capitulo.texto||"")}</textarea>
-<div class="escrita-rodape">Salvamento automático · ${escapar(titulo)}</div>
+<div id="barraFerramentasCapitulo" class="barra-formatacao-capitulo" role="toolbar" aria-label="Ferramentas de formatação" aria-hidden="true">
+<div class="editor-ferramentas-info">Formatação e edição</div>
+<button type="button" class="btn-ferramenta-editor" onclick="executarFormatacaoCapitulo('bold')" title="Negrito" aria-label="Negrito"><strong>B</strong></button>
+<button type="button" class="btn-ferramenta-editor" onclick="executarFormatacaoCapitulo('italic')" title="Itálico" aria-label="Itálico"><em>I</em></button>
+<button type="button" class="btn-ferramenta-editor" onclick="executarFormatacaoCapitulo('underline')" title="Sublinhado" aria-label="Sublinhado"><u>U</u></button>
+<button type="button" class="btn-ferramenta-editor" onclick="executarFormatacaoCapitulo('strikeThrough')" title="Tachado" aria-label="Tachado"><s>S</s></button>
+<span class="separador-ferramentas-editor" aria-hidden="true"></span>
+<button type="button" class="btn-ferramenta-editor" onclick="executarFormatacaoCapitulo('justifyLeft')" title="Alinhar à esquerda" aria-label="Alinhar à esquerda">☰</button>
+<button type="button" class="btn-ferramenta-editor" onclick="executarFormatacaoCapitulo('justifyCenter')" title="Centralizar" aria-label="Centralizar">≡</button>
+<button type="button" class="btn-ferramenta-editor" onclick="executarFormatacaoCapitulo('justifyRight')" title="Alinhar à direita" aria-label="Alinhar à direita">☷</button>
+<button type="button" class="btn-ferramenta-editor" onclick="executarFormatacaoCapitulo('justifyFull')" title="Justificar" aria-label="Justificar">☷</button>
+<span class="separador-ferramentas-editor" aria-hidden="true"></span>
+<button type="button" class="btn-ferramenta-editor" onclick="desfazerCapitulo()" title="Desfazer" aria-label="Desfazer">↶</button>
+<button type="button" class="btn-ferramenta-editor" onclick="refazerCapitulo()" title="Refazer" aria-label="Refazer">↷</button>
+<button type="button" class="btn-ferramenta-editor" onclick="alternarBuscaCapitulo()" title="Pesquisar no capítulo" aria-label="Pesquisar no capítulo">⌕</button>
+<button type="button" class="btn-ferramenta-editor" onclick="alternarMarcacoesCapitulo()" title="Marcações de revisão" aria-label="Marcações de revisão">⚑</button>
+<button type="button" class="btn-ferramenta-editor" onclick="alternarFerramentasCapitulo()" title="Fechar ferramentas" aria-label="Fechar ferramentas">×</button>
+</div>
+<div id="painelBuscaCapitulo" class="painel-busca-capitulo" aria-hidden="true">
+<div class="busca-capitulo-linha"><input id="campoBuscaCapitulo" type="search" placeholder="Pesquisar no capítulo..." autocomplete="off" oninput="pesquisarNoCapitulo()"><button type="button" class="btn-ferramenta-editor" onclick="fecharBuscaCapitulo()" title="Fechar pesquisa" aria-label="Fechar pesquisa">×</button></div>
+<div class="busca-capitulo-linha" style="margin-top:7px"><button type="button" class="btn" onclick="ocorrenciaAnteriorCapitulo()">← Anterior</button><button type="button" class="btn" onclick="proximaOcorrenciaCapitulo()">Próxima →</button></div>
+<div id="resultadoBuscaCapitulo" class="busca-capitulo-resultado"></div>
+</div>
+<div id="painelMarcacoesCapitulo" class="painel-marcacoes-capitulo" aria-hidden="true">
+<div class="painel-marcacoes-titulo">Marcar trecho para revisão</div>
+<div class="painel-marcacoes-grid">
+<button type="button" class="btn-marcacao-capitulo" onmousedown="preservarSelecaoCapitulo(event)" onclick="aplicarMarcacaoCapitulo('observacao','🔎 Observação do autor')">🔎 Observação do autor</button>
+<button type="button" class="btn-marcacao-capitulo" onmousedown="preservarSelecaoCapitulo(event)" onclick="aplicarMarcacaoCapitulo('nota','📝 Nota')">📝 Nota</button>
+<button type="button" class="btn-marcacao-capitulo" onmousedown="preservarSelecaoCapitulo(event)" onclick="aplicarMarcacaoCapitulo('revisar','🔧 Trecho para revisar')">🔧 Trecho para revisar</button>
+<button type="button" class="btn-marcacao-capitulo" onmousedown="preservarSelecaoCapitulo(event)" onclick="aplicarMarcacaoCapitulo('pesquisar','🔍 Informação para pesquisar')">🔍 Informação para pesquisar</button>
+<button type="button" class="btn-marcacao-capitulo" onmousedown="preservarSelecaoCapitulo(event)" onclick="aplicarMarcacaoCapitulo('alterar','✏️ Trecho que precisa ser alterado')">✏️ Precisa ser alterado</button>
+<button type="button" class="btn-marcacao-capitulo" onclick="removerMarcacaoCapitulo()">🧹 Remover marcação</button>
+</div>
+</div>
+<div id="campoTextoCapitulo" class="campo-texto-capitulo" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Comece a escrever seu capítulo..." oninput="agendarSalvamentoCapitulo();atualizarEstatisticasCapitulo()">${normalizarHTMLCapitulo(capitulo.texto||"")}</div>
 <div class="editor-acoes">
 <button class="btn btn-perigo" onclick="excluirCapitulo()">Excluir capítulo</button>
 </div>
 </div>`;
 atualizarEstatisticasCapitulo();
 }
+function alternarFerramentasCapitulo(){
+const barra=document.getElementById("barraFerramentasCapitulo");
+const fab=document.getElementById("botaoFlutuanteSecundario");
+if(!barra)return;
+const aberta=!barra.classList.contains("aberta");
+barra.classList.toggle("aberta",aberta);
+barra.setAttribute("aria-hidden",aberta?"false":"true");
+if(fab){fab.setAttribute("aria-expanded",aberta?"true":"false");fab.setAttribute("aria-label",aberta?"Ocultar ferramentas de escrita":"Ferramentas de escrita")}
+}
+
 function ativarEdicaoTituloCapitulo(){
 const visual=document.getElementById("tituloCapituloVisual");
 const campo=document.getElementById("campoTituloCapitulo");
@@ -4213,11 +4359,257 @@ campo.style.display="none";
 agendarSalvamentoCapitulo();
 }
 
+function escaparTextoHTMLCapitulo(texto){
+return String(texto||"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/\n/g,"<br>");
+}
+function sanitizarHTMLCapitulo(html){
+const modelo=document.createElement("div");
+modelo.innerHTML=String(html||"");
+const permitidas=new Set(["B","STRONG","I","EM","U","S","STRIKE","BR","DIV","P","SPAN"]);
+const alinhar=new Set(["left","center","right","justify"]);
+modelo.querySelectorAll("*").forEach(el=>{
+if(!permitidas.has(el.tagName)){
+const pai=el.parentNode;
+while(el.firstChild)pai.insertBefore(el.firstChild,el);
+if(el.parentNode)el.parentNode.removeChild(el);
+return;
+}
+[...el.attributes].forEach(attr=>{
+if(attr.name!=="style"&&attr.name!=="class"&&attr.name!=="data-marcacao"&&attr.name!=="data-label")el.removeAttribute(attr.name);
+});
+if(el.classList.contains("marcacao-processo")){
+const tipos=new Set(["observacao","nota","revisar","pesquisar","alterar"]);
+if(!tipos.has(el.getAttribute("data-marcacao"))){
+while(el.firstChild)el.parentNode.insertBefore(el.firstChild,el);
+el.parentNode?.removeChild(el);
+return;
+}
+if(!el.getAttribute("data-label"))el.setAttribute("data-label",el.getAttribute("data-marcacao")||"Marcação");
+}else{
+el.removeAttribute("data-marcacao");
+el.removeAttribute("data-label");
+}
+if(el.hasAttribute("style")){
+const alinhamento=(el.style.textAlign||"").toLowerCase();
+if(alinhar.has(alinhamento))el.setAttribute("style",`text-align:${alinhamento}`);
+else el.removeAttribute("style");
+}
+});
+return modelo.innerHTML.trim();
+}
+function normalizarHTMLCapitulo(texto){
+const valor=String(texto||"");
+if(!valor)return "";
+if(/<\/?(b|strong|i|em|u|s|strike|br|div|p)[\s>]/i.test(valor))return sanitizarHTMLCapitulo(valor);
+return escaparTextoHTMLCapitulo(valor);
+}
+function focarEditorCapitulo(){
+const campo=document.getElementById("campoTextoCapitulo");
+if(!campo)return null;
+campo.focus();
+return campo;
+}
+function executarFormatacaoCapitulo(comando){
+const campo=focarEditorCapitulo();
+if(!campo)return;
+try{document.execCommand(comando,false,null)}catch(erro){console.warn("Formatação indisponível",erro)}
+agendarSalvamentoCapitulo();
+atualizarEstatisticasCapitulo();
+}
+function desfazerCapitulo(){
+const campo=focarEditorCapitulo();
+if(!campo)return;
+try{document.execCommand("undo",false,null)}catch(erro){}
+agendarSalvamentoCapitulo();
+atualizarEstatisticasCapitulo();
+}
+function refazerCapitulo(){
+const campo=focarEditorCapitulo();
+if(!campo)return;
+try{document.execCommand("redo",false,null)}catch(erro){}
+agendarSalvamentoCapitulo();
+atualizarEstatisticasCapitulo();
+}
+document.addEventListener("paste",function(event){
+const campo=document.getElementById("campoTextoCapitulo");
+if(!campo||document.activeElement!==campo)return;
+event.preventDefault();
+const texto=(event.clipboardData||window.clipboardData)?.getData("text/plain")||"";
+if(texto)document.execCommand("insertText",false,texto);
+agendarSalvamentoCapitulo();
+atualizarEstatisticasCapitulo();
+});
+async function copiarSelecaoCapitulo(){
+const campo=document.getElementById("campoTextoCapitulo");
+if(!campo)return;
+try{
+const selecao=window.getSelection();
+if(!selecao||selecao.rangeCount===0||selecao.toString()==="")return;
+const texto=selecao.toString();
+if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(texto);
+else document.execCommand("copy");
+mostrarToast("Texto copiado.");
+}catch(erro){
+try{document.execCommand("copy");mostrarToast("Texto copiado.")}catch(erro2){mostrarToast("Não foi possível copiar agora.")}
+}
+}
+async function colarCapitulo(){
+const campo=focarEditorCapitulo();
+if(!campo)return;
+try{
+if(navigator.clipboard&&navigator.clipboard.readText){
+const texto=await navigator.clipboard.readText();
+if(texto){document.execCommand("insertText",false,texto);agendarSalvamentoCapitulo();atualizarEstatisticasCapitulo();}
+}else{
+document.execCommand("paste");
+agendarSalvamentoCapitulo();
+atualizarEstatisticasCapitulo();
+}
+}catch(erro){
+mostrarToast("Use a opção Colar do teclado/menu do aparelho.");
+}
+}
+
+let estadoBuscaCapitulo={termo:"",ocorrencias:[],indice:-1};
+function alternarBuscaCapitulo(){
+const painel=document.getElementById("painelBuscaCapitulo");
+if(!painel)return;
+const aberta=painel.classList.toggle("aberto");
+painel.setAttribute("aria-hidden",aberta?"false":"true");
+if(aberta){const campo=document.getElementById("campoBuscaCapitulo");if(campo){campo.focus();campo.select();}}
+else limparDestaquesBuscaCapitulo();
+}
+function fecharBuscaCapitulo(){
+const painel=document.getElementById("painelBuscaCapitulo");
+if(painel){painel.classList.remove("aberto");painel.setAttribute("aria-hidden","true")}
+limparDestaquesBuscaCapitulo();
+}
+function limparDestaquesBuscaCapitulo(){
+const campo=document.getElementById("campoTextoCapitulo");
+if(!campo)return;
+const marcas=[...campo.querySelectorAll("span.marca-busca-capitulo")];
+marcas.forEach(m=>{const pai=m.parentNode;if(!pai)return;while(m.firstChild)pai.insertBefore(m.firstChild,m);pai.removeChild(m);});
+estadoBuscaCapitulo={termo:"",ocorrencias:[],indice:-1};
+const resultado=document.getElementById("resultadoBuscaCapitulo");if(resultado)resultado.textContent="";
+}
+function obterNosTextoCapitulo(campo){
+const walker=document.createTreeWalker(campo,NodeFilter.SHOW_TEXT,{acceptNode(node){return node.nodeValue?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
+const nos=[];let texto="",node;
+while(node=walker.nextNode()){nos.push({node,inicio:texto.length,fim:texto.length+node.nodeValue.length});texto+=node.nodeValue}
+return {nos,texto};
+}
+function aplicarDestaquesBuscaCapitulo(termo){
+const campo=document.getElementById("campoTextoCapitulo");if(!campo)return 0;
+limparDestaquesBuscaCapitulo();
+termo=String(termo||"").trim();if(!termo)return 0;
+const base=obterNosTextoCapitulo(campo);const origem=base.texto.toLocaleLowerCase();const alvo=termo.toLocaleLowerCase();
+const matches=[];let pos=0;
+while((pos=origem.indexOf(alvo,pos))!==-1){matches.push({inicio:pos,fim:pos+alvo.length});pos+=Math.max(1,alvo.length)}
+for(let i=matches.length-1;i>=0;i--){const m=matches[i];let inicioRef=null,fimRef=null;
+for(const item of base.nos){if(!inicioRef&&m.inicio>=item.inicio&&m.inicio<item.fim)inicioRef={item,offset:m.inicio-item.inicio};if(m.fim>item.inicio&&m.fim<=item.fim){fimRef={item,offset:m.fim-item.inicio};break}}
+if(!inicioRef||!fimRef)continue;
+const range=document.createRange();range.setStart(inicioRef.item.node,inicioRef.offset);range.setEnd(fimRef.item.node,fimRef.offset);
+const marca=document.createElement("span");marca.className="marca-busca-capitulo";try{range.surroundContents(marca)}catch(e){const frag=range.extractContents();marca.appendChild(frag);range.insertNode(marca)}}
+const marcas=[...campo.querySelectorAll("span.marca-busca-capitulo")];
+estadoBuscaCapitulo={termo,ocorrencias:marcas,indice:marcas.length?0:-1};
+if(marcas.length)focarOcorrenciaBuscaCapitulo(0);
+return matches.length;
+}
+function focarOcorrenciaBuscaCapitulo(indice){
+const marcas=estadoBuscaCapitulo.ocorrencias;if(!marcas.length)return;
+indice=(indice+marcas.length)%marcas.length;estadoBuscaCapitulo.indice=indice;
+marcas.forEach((m,i)=>m.style.outline=i===indice?"2px solid var(--rosa)":"none");
+marcas[indice].scrollIntoView({behavior:"smooth",block:"center",inline:"nearest"});
+const resultado=document.getElementById("resultadoBuscaCapitulo");if(resultado)resultado.textContent=`${indice+1} de ${marcas.length} ocorrência${marcas.length===1?"":"s"}`;
+}
+function pesquisarNoCapitulo(){
+const campo=document.getElementById("campoBuscaCapitulo");if(!campo)return;
+const termo=campo.value||"";const total=aplicarDestaquesBuscaCapitulo(termo);const resultado=document.getElementById("resultadoBuscaCapitulo");
+if(resultado&&String(termo).trim()&&!total)resultado.textContent="Nenhuma ocorrência encontrada.";
+}
+function proximaOcorrenciaCapitulo(){if(!estadoBuscaCapitulo.ocorrencias.length){pesquisarNoCapitulo();return}focarOcorrenciaBuscaCapitulo(estadoBuscaCapitulo.indice+1)}
+function ocorrenciaAnteriorCapitulo(){if(!estadoBuscaCapitulo.ocorrencias.length){pesquisarNoCapitulo();return}focarOcorrenciaBuscaCapitulo(estadoBuscaCapitulo.indice-1)}
+
+let selecaoCapituloPreservada=null;
+function preservarSelecaoCapitulo(event){
+if(event)event.preventDefault();
+const campo=document.getElementById("campoTextoCapitulo");const sel=window.getSelection();
+if(!campo||!sel||!sel.rangeCount)return;
+const range=sel.getRangeAt(0);
+if(campo.contains(range.commonAncestorContainer))selecaoCapituloPreservada=range.cloneRange();
+}
+document.addEventListener("selectionchange",function(){
+const campo=document.getElementById("campoTextoCapitulo");const sel=window.getSelection();
+if(!campo||!sel||!sel.rangeCount)return;
+const range=sel.getRangeAt(0);
+if(campo.contains(range.commonAncestorContainer)&&sel.toString())selecaoCapituloPreservada=range.cloneRange();
+});
+function alternarMarcacoesCapitulo(){
+const painel=document.getElementById("painelMarcacoesCapitulo");if(!painel)return;
+const aberto=painel.classList.toggle("aberto");painel.setAttribute("aria-hidden",aberto?"false":"true");
+if(aberto){preservarSelecaoCapitulo();}
+}
+function fecharMarcacoesCapitulo(){
+const painel=document.getElementById("painelMarcacoesCapitulo");if(painel){painel.classList.remove("aberto");painel.setAttribute("aria-hidden","true")}
+}
+function aplicarMarcacaoCapitulo(tipo,label){
+const campo=document.getElementById("campoTextoCapitulo");if(!campo)return;
+if(!selecaoCapituloPreservada||!campo.contains(selecaoCapituloPreservada.commonAncestorContainer)){mostrarToast("Selecione um trecho do capítulo primeiro.");return}
+const range=selecaoCapituloPreservada;
+if(range.collapsed||!range.toString().trim()){mostrarToast("Selecione um trecho do capítulo primeiro.");return}
+
+// Usa o próprio mecanismo de edição do contenteditable para substituir a seleção.
+// Isso é mais estável em Android/WebView do que extractContents()/insertNode(),
+// que pode fazer o trecho selecionado desaparecer visualmente.
+const temporario=document.createElement("div");
+temporario.appendChild(range.cloneContents());
+const conteudo=temporario.innerHTML;
+const marca=`<span class="marcacao-processo marcacao-${tipo}" data-marcacao="${tipo}" data-label="${escapar(String(label))}">${conteudo}</span>`;
+
+campo.focus();
+const sel=window.getSelection();
+sel.removeAllRanges();
+sel.addRange(range);
+let aplicado=false;
+try{aplicado=document.execCommand("insertHTML",false,marca)}catch(erro){aplicado=false}
+
+if(!aplicado){
+  // Fallback conservador: restaura a seleção e informa sem apagar o conteúdo.
+  sel.removeAllRanges();sel.addRange(range);
+  mostrarToast("Não foi possível aplicar a marcação agora. O trecho foi preservado.");
+  return;
+}
+
+selecaoCapituloPreservada=null;
+fecharMarcacoesCapitulo();
+agendarSalvamentoCapitulo();
+atualizarEstatisticasCapitulo();
+mostrarToast("Trecho marcado para revisão.");
+}
+
+function removerMarcacaoCapitulo(){
+const campo=document.getElementById("campoTextoCapitulo");if(!campo)return;
+const sel=window.getSelection();let alvo=null;
+if(sel&&sel.rangeCount){let no=sel.anchorNode;while(no&&no!==campo){if(no.nodeType===1&&no.classList?.contains("marcacao-processo")){alvo=no;break}no=no.parentNode}}
+if(!alvo&&selecaoCapituloPreservada){let no=selecaoCapituloPreservada.commonAncestorContainer;while(no&&no!==campo){if(no.nodeType===1&&no.classList?.contains("marcacao-processo")){alvo=no;break}no=no.parentNode}}
+if(!alvo){mostrarToast("Toque dentro de um trecho marcado para removê-lo.");return}
+const pai=alvo.parentNode;while(alvo.firstChild)pai.insertBefore(alvo.firstChild,alvo);pai.removeChild(alvo);fecharMarcacoesCapitulo();agendarSalvamentoCapitulo();atualizarEstatisticasCapitulo();mostrarToast("Marcação removida.");
+}
+function removerMarcacoesParaLeitura(html){
+const modelo=document.createElement("div");modelo.innerHTML=String(html||"");
+modelo.querySelectorAll("span.marcacao-processo").forEach(el=>{const pai=el.parentNode;while(el.firstChild)pai.insertBefore(el.firstChild,el);el.remove()});
+return modelo.innerHTML;
+}
+
 function atualizarEstatisticasCapitulo(){
 const area=document.getElementById("estatisticasCapitulo");
 const campoTexto=document.getElementById("campoTextoCapitulo");
 if(!area||!campoTexto)return;
-const texto=campoTexto.value||"";
+const texto=(campoTexto.innerText||campoTexto.textContent||"").replace(/\u00a0/g," ");
 const palavras=texto.trim()?texto.trim().split(/\s+/).length:0;
 const caracteres=texto.length;
 const paginas=palavras?Math.max(1,Math.ceil(palavras/250)):0;
@@ -4272,7 +4664,7 @@ const agora=Date.now();
 capitulo.titulo=
 campoTitulo.value;
 capitulo.texto=
-campoTexto.value;
+sanitizarHTMLCapitulo(campoTexto.innerHTML);
 capitulo.atualizadoEm=
 agora;
 historia.atualizadoEm=
@@ -12461,7 +12853,7 @@ return `<article class="card-livro"><div class="card-livro-titulo">${escapar(h.t
 }
 function abrirModoLivro(id){
 const h=historias.find(item=>String(item.id)===String(id));if(!h)return;
-livroAberto=h.id;mostrarTela("modoLivro")
+livroAberto=h.id;capituloLivroAberto=null;mostrarTela("modoLivro")
 }
 function verificarLivro(historia){
 const problemas=[];const caps=Array.isArray(historia.capitulos)?historia.capitulos:[];
@@ -12484,21 +12876,45 @@ const problemas=verificarLivro(historia);
 if(!problemas.length)return `<div class="verificacao-item verificacao-ok">✓ Nenhum problema estrutural básico foi encontrado. A verificação não altera seu texto.</div>`;
 return problemas.map(p=>`<div class="verificacao-item verificacao-alerta">⚠️ ${escapar(p)}</div>`).join("")
 }
+function abrirCapituloLeituraLivro(idHistoria,idCapitulo){
+const h=historias.find(item=>String(item.id)===String(idHistoria));
+if(!h)return;
+const c=(Array.isArray(h.capitulos)?h.capitulos:[]).find(item=>String(item.id)===String(idCapitulo));
+if(!c)return;
+livroAberto=h.id;
+capituloLivroAberto=c.id;
+renderizarModoLivro();
+setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),30);
+}
+function voltarParaCapitulosLivro(){
+capituloLivroAberto=null;
+renderizarModoLivro();
+setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),30);
+}
 function renderizarModoLivro(){
 const area=document.getElementById("conteudoModoLivro");if(!area)return;
 const h=historias.find(item=>String(item.id)===String(livroAberto));
-if(!h){mostrarTela("meusLivros");return}
+if(!h){capituloLivroAberto=null;mostrarTela("meusLivros");return}
 const config=obterConfigModoLivro(h);const caps=Array.isArray(h.capitulos)?h.capitulos:[];
 const alinhamento=config.alinhamento||"left";
 const textoCap=`font-size:${Number(config.tituloTamanho)||34}px;text-align:${alinhamento}`;
-area.innerHTML=`<div class="editor-cabecalho"><button class="btn btn-voltar editor-voltar" onclick="livroAberto=null;mostrarTela('meusLivros')">← Meus livros</button><h1 class="editor-titulo">${escapar(h.titulo||"Sem título")}</h1><div class="editor-meta"><div class="status-salvamento">Modo Livro</div><button class="btn" onclick="editarHistoria(${JSON.stringify(h.id)})">Editar história</button></div></div>
+const capAberto=caps.find(c=>String(c.id)===String(capituloLivroAberto));
+if(capAberto){
+const indice=caps.findIndex(c=>String(c.id)===String(capAberto.id));
+const estiloTitulo=config.estiloCapitulo==="discreto"?"font-size:22px;":"font-size:28px;";
+area.innerHTML=`<div class="editor-cabecalho livro-leitura-cabecalho"><button class="btn btn-voltar editor-voltar" onclick="voltarParaCapitulosLivro()">← Capítulos</button><h1 class="editor-titulo">${escapar(h.titulo||"Sem título")}</h1><div class="editor-meta"><div class="status-salvamento">Leitura · Capítulo ${indice+1} de ${caps.length}</div><button class="btn" onclick="editarHistoria(${JSON.stringify(h.id)})">Editar história</button></div></div>
+<div class="livro-folha"><h2 style="font-family:Georgia,serif;${estiloTitulo}">${indice+1}. ${escapar(capAberto.titulo||"Sem título")}</h2><div class="livro-leitura-texto" style="line-height:${Number(config.espacamento)||1.8};text-align:${alinhamento}">${normalizarHTMLCapitulo(removerMarcacoesParaLeitura(capAberto.texto||""))}</div></div>
+<div class="acoes"><button class="btn" ${indice<=0?'disabled':''} onclick='${indice>0?`abrirCapituloLeituraLivro(${JSON.stringify(h.id)},${JSON.stringify(caps[indice-1].id)})`:''}'>← Anterior</button><button class="btn" ${indice>=caps.length-1?'disabled':''} onclick='${indice<caps.length-1?`abrirCapituloLeituraLivro(${JSON.stringify(h.id)},${JSON.stringify(caps[indice+1].id)})`:''}'>Próximo →</button></div>`;
+return
+}
+area.innerHTML=`<div class="editor-cabecalho"><button class="btn btn-voltar editor-voltar" onclick="livroAberto=null;capituloLivroAberto=null;mostrarTela('meusLivros')">← Meus livros</button><h1 class="editor-titulo">${escapar(h.titulo||"Sem título")}</h1><div class="editor-meta"><div class="status-salvamento">Modo Livro</div><button class="btn" onclick="editarHistoria(${JSON.stringify(h.id)})">Editar história</button></div></div>
 <div class="livro-capa"><div class="livro-capa-titulo" style="${textoCap}">${escapar(h.titulo||"Sem título")}</div><div class="livro-capa-subtitulo">${escapar(h.universo||"")}</div></div>
 <div class="livro-folha rosto"><h2>${escapar(h.titulo||"Sem título")}</h2><div class="livro-capa-subtitulo">${escapar(h.descricao||"")}</div></div>
-<div class="livro-folha"><h2 style="font-family:Georgia,serif">Sumário</h2><ol class="livro-sumario">${caps.map((c,i)=>`<li>${String(i+1).padStart(2,"0")} — ${escapar(c.titulo||"Sem título")}</li>`).join("")}</ol></div>
+<div class="livro-folha"><h2 style="font-family:Georgia,serif">Sumário</h2><ol class="livro-sumario">${caps.map((c,i)=>`<li><button class="livro-capitulo-card" onclick='abrirCapituloLeituraLivro(${JSON.stringify(h.id)},${JSON.stringify(c.id)})'><div class="livro-capitulo-card-numero">CAPÍTULO ${String(i+1).padStart(2,"0")}</div><div class="livro-capitulo-card-titulo">${escapar(c.titulo||"Sem título")}</div><div class="livro-capitulo-card-meta">${String(c.texto||"").trim()?"Toque para ler este capítulo":"Capítulo ainda vazio"}</div></button></li>`).join("")}</ol></div>
 <div class="livro-folha"><h2 style="font-family:Georgia,serif">Revisão estrutural</h2>${renderizarVerificacaoLivro(h)}</div>
-<div class="card"><h2 style="font-family:Georgia,serif;margin-top:0">Ajustes de apresentação</h2><div class="livro-config-grid"><div><label for="configLivroTitulo">Tamanho do título</label><input id="configLivroTitulo" type="number" min="20" max="60" value="${Number(config.tituloTamanho)||34}"></div><div><label for="configLivroAlinhamento">Alinhamento</label><select id="configLivroAlinhamento"><option value="left" ${alinhamento==="left"?"selected":""}>Esquerda</option><option value="center" ${alinhamento==="center"?"selected":""}>Centro</option><option value="justify" ${alinhamento==="justify"?"selected":""}>Justificado</option></select></div><div><label for="configLivroEspacamento">Espaçamento</label><input id="configLivroEspacamento" type="number" min="1" max="3" step="0.1" value="${Number(config.espacamento)||1.8}"></div><div><label for="configLivroMargens">Margens de visualização</label><input id="configLivroMargens" type="number" min="12" max="60" value="${Number(config.margens)||24}"></div><div><label for="configLivroCapitulo">Estilo dos capítulos</label><select id="configLivroCapitulo"><option value="classico" ${config.estiloCapitulo==="classico"?"selected":""}>Clássico</option><option value="discreto" ${config.estiloCapitulo==="discreto"?"selected":""}>Discreto</option></select></div><div><label for="configLivroSeparador">Separador</label><input id="configLivroSeparador" type="text" value="${escapar(config.separador||"✦ · ✦")}"></div></div><button class="btn btn-principal" style="width:100%;margin-top:12px" onclick="salvarConfigModoLivro(historias.find(item=>String(item.id)===String(livroAberto)))">Salvar ajustes</button></div>
-<div id="conteudoCapitulosLivro" style="margin-top:18px">${caps.map((c,i)=>`<article class="livro-folha livro-capitulo" style="padding-left:${Number(config.margens)||24}px;padding-right:${Number(config.margens)||24}px"><h2 style="${config.estiloCapitulo==="discreto"?"font-size:22px;":"font-size:28px;"}">${i+1}. ${escapar(c.titulo||"Sem título")}</h2><div class="livro-texto" style="line-height:${Number(config.espacamento)||1.8};text-align:${alinhamento}">${escapar(c.texto||"")}</div><div class="livro-separador">${escapar(config.separador||"✦ · ✦")}</div><div class="livro-pagina-numero">Página ${i+1}</div></article>`).join("")}</div>`
+<div class="card"><h2 style="font-family:Georgia,serif;margin-top:0">Ajustes de apresentação</h2><div class="livro-config-grid"><div><label for="configLivroTitulo">Tamanho do título</label><input id="configLivroTitulo" type="number" min="20" max="60" value="${Number(config.tituloTamanho)||34}"></div><div><label for="configLivroAlinhamento">Alinhamento</label><select id="configLivroAlinhamento"><option value="left" ${alinhamento==="left"?"selected":""}>Esquerda</option><option value="center" ${alinhamento==="center"?"selected":""}>Centro</option><option value="justify" ${alinhamento==="justify"?"selected":""}>Justificado</option></select></div><div><label for="configLivroEspacamento">Espaçamento</label><input id="configLivroEspacamento" type="number" min="1" max="3" step="0.1" value="${Number(config.espacamento)||1.8}"></div><div><label for="configLivroMargens">Margens de visualização</label><input id="configLivroMargens" type="number" min="12" max="60" value="${Number(config.margens)||24}"></div><div><label for="configLivroCapitulo">Estilo dos capítulos</label><select id="configLivroCapitulo"><option value="classico" ${config.estiloCapitulo==="classico"?"selected":""}>Clássico</option><option value="discreto" ${config.estiloCapitulo==="discreto"?"selected":""}>Discreto</option></select></div><div><label for="configLivroSeparador">Separador</label><input id="configLivroSeparador" type="text" value="${escapar(config.separador||"✦ · ✦")}"></div></div><button class="btn btn-principal" style="width:100%;margin-top:12px" onclick="salvarConfigModoLivro(historias.find(item=>String(item.id)===String(livroAberto)))">Salvar ajustes</button></div>`
 }
+
 function abrirHistoriaAPartirDoLivro(id){abrirHistoria(id)}
 function abrirBancoBiblioteca(){return new Promise((resolve,reject)=>{if(!window.indexedDB){reject(new Error("IndexedDB indisponível"));return}const req=indexedDB.open(CHAVE_IDB_BIBLIOTECA,1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(STORE_IDB_BIBLIOTECA)){db.createObjectStore(STORE_IDB_BIBLIOTECA,{keyPath:"id"})}};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||new Error("Erro no banco"))})}
 async function guardarPDFBiblioteca(item){const db=await abrirBancoBiblioteca();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_IDB_BIBLIOTECA,"readwrite");tx.objectStore(STORE_IDB_BIBLIOTECA).put(item);tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
@@ -12515,13 +12931,88 @@ async function removerPDFBiblioteca(id){const item=await obterPDFBiblioteca(id);
 async function abrirPDFBiblioteca(id){const item=await obterPDFBiblioteca(id);if(!item)return;pdfAberto=id;pdfPaginaAtual=Math.max(1,Number(item.ultimaPagina)||1);pdfTextoPaginaAtual="";pdfTextoTraducao="";mostrarTela("leitorPDF");setTimeout(()=>carregarPDFNoLeitor(item),50)}
 async function carregarPDFNoLeitor(item){const area=document.getElementById("conteudoLeitorPDF");if(!area)return;if(pdfUrlAtual){URL.revokeObjectURL(pdfUrlAtual);pdfUrlAtual=null}const blob=item.blob;pdfUrlAtual=URL.createObjectURL(blob);area.innerHTML=`<div class="pdf-leitor-cabecalho"><button class="btn btn-voltar" onclick="fecharLeitorPDF()">← Biblioteca</button><div><b>${escapar(item.titulo||item.nomeArquivo)}</b><div class="card-livro-meta">${item.autor?escapar(item.autor):""}</div></div></div><div class="pdf-controles"><button class="btn" onclick="mudarPaginaPDF(-1)">← Anterior</button><input id="campoPaginaPDF" type="number" min="1" value="${pdfPaginaAtual}" onchange="irParaPaginaPDF()"><button class="btn" onclick="mudarPaginaPDF(1)">Próxima →</button><button class="btn" onclick="abrirPDFTelaCheia()">⛶ Tela cheia</button></div><div id="framePDFLeitor" class="pdf-frame" title="Leitor de PDF"><div id="pdfPaginaRenderizada" class="pdf-pagina-renderizada"></div></div><div class="card pdf-traducao"><h3 style="font-family:Georgia,serif;margin-top:0">Tradução opcional</h3><div class="texto-intro">A tradução não substitui o original. Use-a quando quiser, por linha/trecho, por página ou lado a lado.</div><div class="pdf-traducao-opcoes" style="margin-top:10px"><button class="btn" onclick="definirModoTraducaoPDF('original')">Original</button><button class="btn" onclick="traduzirTrechoPDF()">Traduzir linha/trecho</button><button class="btn" onclick="traduzirPaginaPDF()">Traduzir página</button><button class="btn" onclick="definirModoTraducaoPDF('ambos')">Original + tradução</button></div><div id="painelTrechoPDF" style="margin-top:10px"><label for="campoTrechoPDF">Trecho/linha</label><textarea id="campoTrechoPDF" placeholder="Digite ou cole um trecho curto para traduzir."></textarea></div><div id="resultadoTraducaoPDF" class="pdf-traducao-resultado pdf-oculto"></div></div>`;try{if(!window.pdfjsLib)throw new Error("PDF.js indisponível");const buffer=await blob.arrayBuffer();pdfDocumentoAtual=await pdfjsLib.getDocument({data:buffer}).promise;pdfTotalPaginas=pdfDocumentoAtual.numPages;atualizarControlesPDF();await renderizarPaginaPDF(pdfPaginaAtual);await extrairTextoPaginaPDF(pdfPaginaAtual)}catch(erro){console.warn("PDF.js indisponível ou não conseguiu ler o PDF:",erro);pdfDocumentoAtual=null;pdfTotalPaginas=0;const pagina=document.getElementById("pdfPaginaRenderizada");if(pagina)pagina.innerHTML=`<div class="card vazio"><h3>Não foi possível carregar este PDF.</h3><p>O arquivo foi selecionado, mas o leitor não conseguiu processá-lo.</p></div>`;atualizarControlesPDF()}}
 function atualizarControlesPDF(){const campo=document.getElementById("campoPaginaPDF");if(campo){campo.max=pdfTotalPaginas||"";campo.value=pdfPaginaAtual}}
-async function renderizarPaginaPDF(numero){if(!pdfDocumentoAtual)return;const pagina=document.getElementById("pdfPaginaRenderizada");if(!pagina)return;pagina.innerHTML=`<div class="pdf-carregando">Carregando página ${numero}...</div>`;try{const page=await pdfDocumentoAtual.getPage(numero);const viewportBase=page.getViewport({scale:1});const larguraDisponivel=Math.max(280,pagina.clientWidth||720);const escala=Math.min(2.2,larguraDisponivel/viewportBase.width);const viewport=page.getViewport({scale:escala});const canvas=document.createElement("canvas");canvas.className="pdf-canvas";canvas.width=Math.floor(viewport.width);canvas.height=Math.floor(viewport.height);canvas.setAttribute("aria-label",`Página ${numero} do PDF`);pagina.innerHTML="";pagina.appendChild(canvas);const contexto=canvas.getContext("2d");await page.render({canvasContext:contexto,viewport}).promise}catch(erro){console.warn("Não foi possível renderizar a página do PDF:",erro);pagina.innerHTML=`<div class="card vazio"><h3>Não foi possível exibir esta página.</h3><p>Tente avançar ou voltar uma página.</p></div>`}}
+async function renderizarPaginaPDF(numero){
+if(!pdfDocumentoAtual)return;
+const pagina=document.getElementById("pdfPaginaRenderizada");
+if(!pagina)return;
+pagina.innerHTML=`<div class="pdf-carregando">Carregando página ${numero}...</div>`;
+try{
+const page=await pdfDocumentoAtual.getPage(numero);
+const viewportBase=page.getViewport({scale:1});
+const frame=document.getElementById("framePDFLeitor");
+const telaCheia=!!frame?.classList.contains("pdf-leitor-fullscreen");
+const larguraDisponivel=Math.max(280,(frame?.clientWidth||pagina.clientWidth||720)-24);
+const alturaDisponivel=Math.max(320,(frame?.clientHeight||window.innerHeight||720)-24);
+const escalaPorLargura=larguraDisponivel/viewportBase.width;
+const escalaPorAltura=alturaDisponivel/viewportBase.height;
+let escala;
+if(telaCheia){
+  // Em leitura, priorizamos o tamanho confortável do texto.
+  // Para páginas de livro (retrato), a altura da tela define a escala.
+  // A página pode ficar mais larga que o visor; o leitor permite deslocamento horizontal.
+  const retrato=viewportBase.height>viewportBase.width;
+  escala=retrato?escalaPorAltura:escalaPorLargura;
+  escala=Math.min(3.2,escala);
+}else{
+  escala=Math.min(2.2,escalaPorLargura);
+}
+const viewport=page.getViewport({scale:escala});
+const canvas=document.createElement("canvas");
+canvas.className="pdf-canvas";
+canvas.setAttribute("aria-label",`Página ${numero} do PDF`);
+canvas.style.width=`${Math.floor(viewport.width)}px`;
+canvas.style.height=`${Math.floor(viewport.height)}px`;
+const areaCSS=Math.max(1,viewport.width*viewport.height);
+const dpr=Math.max(1,window.devicePixelRatio||1);
+const escalaQualidade=Math.min(3,dpr);
+const maxPixels=10000000;
+const escalaMemoria=Math.min(1,Math.sqrt(maxPixels/areaCSS));
+const outputScale=Math.max(1,escalaQualidade*escalaMemoria);
+canvas.width=Math.max(1,Math.floor(viewport.width*outputScale));
+canvas.height=Math.max(1,Math.floor(viewport.height*outputScale));
+pagina.innerHTML="";
+pagina.appendChild(canvas);
+const contexto=canvas.getContext("2d",{alpha:false});
+const transform=outputScale!==1?[outputScale,0,0,outputScale,0,0]:null;
+await page.render({canvasContext:contexto,viewport,transform}).promise;
+if(telaCheia){canvas.classList.add("pdf-trocando-pagina");setTimeout(()=>canvas.classList.remove("pdf-trocando-pagina"),180)}
+}catch(erro){
+console.warn("Não foi possível renderizar a página do PDF:",erro);
+pagina.innerHTML=`<div class="card vazio"><h3>Não foi possível exibir esta página.</h3><p>Tente avançar ou voltar uma página.</p></div>`
+}}
 async function extrairTextoPaginaPDF(numero){if(!pdfDocumentoAtual)return"";try{const pagina=await pdfDocumentoAtual.getPage(numero);const conteudo=await pagina.getTextContent();pdfTextoPaginaAtual=conteudo.items.map(i=>i.str||"").join("\n");const campo=document.getElementById("campoTrechoPDF");if(campo)campo.value=pdfTextoPaginaAtual;return pdfTextoPaginaAtual}catch(erro){console.warn(erro);pdfTextoPaginaAtual="";return""}}
 async function salvarPaginaPDF(){if(!pdfAberto)return;const item=await obterPDFBiblioteca(pdfAberto);if(!item)return;item.ultimaPagina=pdfPaginaAtual;await atualizarPDFBiblioteca(item)}
 async function mudarPaginaPDF(delta){let nova=pdfPaginaAtual+delta;if(pdfTotalPaginas)nova=Math.min(pdfTotalPaginas,Math.max(1,nova));else nova=Math.max(1,nova);pdfPaginaAtual=nova;atualizarControlesPDF();await renderizarPaginaPDF(pdfPaginaAtual);await extrairTextoPaginaPDF(pdfPaginaAtual);await salvarPaginaPDF()}
 async function irParaPaginaPDF(){const campo=document.getElementById("campoPaginaPDF");let nova=parseInt(campo?.value,10)||1;if(pdfTotalPaginas)nova=Math.min(pdfTotalPaginas,Math.max(1,nova));else nova=Math.max(1,nova);pdfPaginaAtual=nova;atualizarControlesPDF();await renderizarPaginaPDF(pdfPaginaAtual);await extrairTextoPaginaPDF(pdfPaginaAtual);await salvarPaginaPDF()}
-async function fecharLeitorPDF(){if(pdfAberto)await salvarPaginaPDF();pdfAberto=null;pdfDocumentoAtual=null;pdfTextoPaginaAtual="";if(pdfUrlAtual){URL.revokeObjectURL(pdfUrlAtual);pdfUrlAtual=null}mostrarTela("biblioteca")}
-function abrirPDFTelaCheia(){const frame=document.getElementById("framePDFLeitor");if(frame?.requestFullscreen)frame.requestFullscreen();else mostrarToast("Tela cheia não é suportada neste navegador.")}
+async function fecharLeitorPDF(){fecharPDFTelaCheia();if(pdfAberto)await salvarPaginaPDF();pdfAberto=null;pdfDocumentoAtual=null;pdfTextoPaginaAtual="";if(pdfUrlAtual){URL.revokeObjectURL(pdfUrlAtual);pdfUrlAtual=null}mostrarTela("biblioteca")}
+function abrirPDFTelaCheia(){const frame=document.getElementById("framePDFLeitor");if(!frame)return;frame.classList.add("pdf-leitor-fullscreen");document.body.classList.add("pdf-em-tela-cheia");document.documentElement.classList.add("pdf-em-tela-cheia");const saida=document.getElementById("pdfSaidaFullscreen");if(saida)saida.focus();requestAnimationFrame(()=>requestAnimationFrame(()=>{if(pdfDocumentoAtual)renderizarPaginaPDF(pdfPaginaAtual)}))} function fecharPDFTelaCheia(){const frame=document.getElementById("framePDFLeitor");if(frame)frame.classList.remove("pdf-leitor-fullscreen");document.body.classList.remove("pdf-em-tela-cheia");document.documentElement.classList.remove("pdf-em-tela-cheia");}
+let ultimoToquePDF=0;
+document.addEventListener("touchend",async function(event){
+  const frame=document.getElementById("framePDFLeitor");
+  if(!frame?.classList.contains("pdf-leitor-fullscreen"))return;
+  const toque=event.changedTouches?.[0];
+  if(!toque)return;
+  const agora=Date.now();
+  if(toque.clientY<90&&agora-ultimoToquePDF<450){
+    fecharPDFTelaCheia();
+    ultimoToquePDF=0;
+    return;
+  }
+  if(toque.clientY<90){
+    ultimoToquePDF=agora;
+    return;
+  }
+  ultimoToquePDF=0;
+  const largura=window.innerWidth||frame.clientWidth||720;
+  if(toque.clientX<largura*0.25) await mudarPaginaPDF(-1);
+  else if(toque.clientX>largura*0.75) await mudarPaginaPDF(1);
+},{passive:true});
+document.addEventListener("keydown",function(event){
+  const frame=document.getElementById("framePDFLeitor");
+  if(!frame?.classList.contains("pdf-leitor-fullscreen"))return;
+  if(event.key==="Escape")fecharPDFTelaCheia();
+});
+let pdfRedimensionamentoTimer=null;window.addEventListener("resize",function(){clearTimeout(pdfRedimensionamentoTimer);pdfRedimensionamentoTimer=setTimeout(function(){const frame=document.getElementById("framePDFLeitor");if(frame?.classList.contains("pdf-leitor-fullscreen")&&pdfDocumentoAtual)renderizarPaginaPDF(pdfPaginaAtual)},180)});
 function definirModoTraducaoPDF(modo){pdfModoTraducao=modo;const resultado=document.getElementById("resultadoTraducaoPDF");if(modo==="original"){if(resultado){resultado.classList.add("pdf-oculto");resultado.textContent=""}return}if(modo==="ambos"&&pdfTextoTraducao){if(resultado){resultado.classList.remove("pdf-oculto");resultado.textContent=`ORIGINAL\n\n${pdfTextoPaginaAtual}\n\nTRADUÇÃO\n\n${pdfTextoTraducao}`}}}
 async function traduzirTextoComServico(texto){const limpo=String(texto||"").trim();if(!limpo)return"";const partes=[];let restante=limpo;while(restante.length>450){let corte=restante.lastIndexOf(" ",450);if(corte<100)corte=450;partes.push(restante.slice(0,corte));restante=restante.slice(corte).trim()}if(restante)partes.push(restante);const traduzidas=[];for(const parte of partes){const url="https://api.mymemory.translated.net/get?langpair=auto|pt-BR&q="+encodeURIComponent(parte);const resposta=await fetch(url);if(!resposta.ok)throw new Error("Serviço de tradução indisponível");const dados=await resposta.json();const t=dados?.responseData?.translatedText;if(!t)throw new Error("Não foi possível obter a tradução");traduzidas.push(t)}return traduzidas.join(" ")}
 async function mostrarResultadoTraducao(textoOriginal,textoTraduzido){const resultado=document.getElementById("resultadoTraducaoPDF");if(!resultado)return;resultado.classList.remove("pdf-oculto");resultado.textContent=pdfModoTraducao==="ambos"?`ORIGINAL\n\n${textoOriginal}\n\nTRADUÇÃO\n\n${textoTraduzido}`:textoTraduzido}
