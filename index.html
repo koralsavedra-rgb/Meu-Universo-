@@ -13724,7 +13724,29 @@ async function exportarDados(){
  console.error("Não foi possível compartilhar o backup como texto:",erroCompartilharTexto)
  }
  
- // 3. Último recurso: mostrar o backup para copiar/colar.
+ // 3. Tentar baixar usando uma URI data:, alternativa para WebViews que bloqueiam Blob/createObjectURL.
+ try{
+ const bytes=new TextEncoder().encode(conteudo);
+ let binario="";
+ const tamanhoBloco=0x8000;
+ for(let i=0;i<bytes.length;i+=tamanhoBloco){
+ binario+=String.fromCharCode(...bytes.subarray(i,Math.min(i+tamanhoBloco,bytes.length)));
+ }
+ const base64DoConteudo=btoa(binario);
+ const link=document.createElement("a");
+ link.href=`data:application/json;base64,${base64DoConteudo}`;
+ link.download=nomeArquivo;
+ link.style.display="none";
+ document.body.appendChild(link);
+ link.click();
+ link.remove();
+ mostrarToast("Se o download não começar em alguns segundos, role para baixo e use copiar/colar.");
+ return
+ }catch(erroDownloadData){
+ console.error("Não foi possível baixar o backup pela URI data:",erroDownloadData)
+ }
+ 
+ // 4. Último recurso: mostrar o backup para copiar/colar.
  if(conteudo.length>150000){
  mostrarToast("Backup grande: prefira baixar o arquivo em vez de copiar e colar.");
  }
