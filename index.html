@@ -2279,20 +2279,25 @@ frequência para não correr o risco de perder tudo.
 Compartilha ou copia um arquivo com tudo: histórias, universos,
 personagens, locais, eventos, jornadas, lembretes, pontos, XP e conquistas.
 </div>
-<div style="display:flex;gap:7px;margin-top:12px">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px">
 <button
 class="btn btn-principal"
-style="flex:1"
-onclick="exportarDados()"
+onclick="salvarBackupArquivo()"
 >
-Baixar/Compartilhar arquivo
+💾 Salvar arquivo
 </button>
 <button
 class="btn"
-style="flex:1"
+onclick="compartilharBackupArquivo()"
+>
+📤 Compartilhar
+</button>
+<button
+class="btn"
+style="grid-column:1 / -1"
 onclick="copiarTextoBackupDireto()"
 >
-Copiar texto do backup
+📋 Copiar texto do backup
 </button>
 </div>
 <div id="containerBackupTexto" style="display:none;margin-top:12px">
@@ -14020,12 +14025,67 @@ function gerarConteudoBackup(){
  return JSON.stringify(pacote,null,2)
 }
 
-async function exportarDados(){
+async function salvarBackupArquivo(){
  const conteudo=gerarConteudoBackup();
  const dataFormatada=new Date().toISOString().slice(0,10);
  const nomeArquivo=`meu-universo-backup-${dataFormatada}.json`;
 
- // 1. No Android, compartilhar o próprio arquivo é a opção mais confiável.
+ // Primeira opção: seletor de salvamento do navegador, quando disponível.
+ if(window.showSaveFilePicker){
+  try{
+   const handle=await window.showSaveFilePicker({
+    suggestedName:nomeArquivo,
+    types:[{
+     description:"Backup do Meu Universo",
+     accept:{"application/json":[".json"]}
+    }]
+   });
+   const writable=await handle.createWritable();
+   await writable.write(conteudo);
+   await writable.close();
+   mostrarToast("Backup salvo com sucesso.");
+   return true;
+  }catch(erro){
+   if(erro&&erro.name==="AbortError")return false;
+   console.error("Erro ao usar o seletor de arquivos:",erro);
+  }
+ }
+
+ // Segunda opção: download tradicional. Alguns ambientes Android/WebView
+ // podem bloquear esta etapa, por isso ela não é a única forma de backup.
+ try{
+  const blob=new Blob([conteudo],{type:"application/json;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");
+  link.href=url;
+  link.download=nomeArquivo;
+  link.style.display="none";
+  document.body.appendChild(link);
+  link.click();
+  setTimeout(()=>{
+   link.remove();
+   URL.revokeObjectURL(url);
+  },5000);
+  mostrarToast("Tentativa de salvar o arquivo iniciada.");
+  return true;
+ }catch(erro){
+  console.error("Não foi possível salvar o arquivo:",erro);
+  mostrarToast("Não foi possível salvar o arquivo. Tente compartilhar ou copiar o texto.");
+  return false;
+ }
+}
+
+async function compartilharBackupArquivo(){
+ const conteudo=gerarConteudoBackup();
+ const dataFormatada=new Date().toISOString().slice(0,10);
+ const nomeArquivo=`meu-universo-backup-${dataFormatada}.json`;
+
+ if(!navigator.share){
+  mostrarToast("O compartilhamento não está disponível neste ambiente. Use 'Salvar arquivo' ou 'Copiar texto'.");
+  return false;
+ }
+
+ // Tentar compartilhar o arquivo JSON diretamente.
  try{
   const arquivo=new File([conteudo],nomeArquivo,{type:"application/json"});
   if(navigator.canShare&&navigator.canShare({files:[arquivo]})){
@@ -14035,51 +14095,32 @@ async function exportarDados(){
     text:"Backup dos dados do Meu Universo"
    });
    mostrarToast("Backup compartilhado.");
-   return;
+   return true;
   }
  }catch(erro){
-  if(erro&&erro.name==="AbortError")return;
+  if(erro&&erro.name==="AbortError")return false;
   console.error("Compartilhamento de arquivo indisponível:",erro);
  }
 
- // 2. Tentar download diretamente, sem abrir copiar/colar.
+ // Fallback: compartilhar o próprio texto do backup.
  try{
-  const blob=new Blob([conteudo],{type:"application/json;charset=utf-8"});
-  const url=URL.createObjectURL(blob);
-  const link=document.createElement("a");
-  link.href=url;
-  link.download=nomeArquivo;
-  link.target="_blank";
-  link.rel="noopener";
-  document.body.appendChild(link);
-  link.click();
-  setTimeout(()=>{
-   link.remove();
-   URL.revokeObjectURL(url);
-  },5000);
-  mostrarToast("Tentativa de download iniciada.");
-  return;
- }catch(erroBlob){
-  console.error("Não foi possível iniciar o download:",erroBlob);
+  await navigator.share({
+   title:"Backup Meu Universo",
+   text:conteudo
+  });
+  mostrarToast("Backup compartilhado como texto.");
+  return true;
+ }catch(erroTexto){
+  if(erroTexto&&erroTexto.name==="AbortError")return false;
+  console.error("Compartilhamento do texto indisponível:",erroTexto);
+  mostrarToast("Não foi possível compartilhar. Use 'Copiar texto do backup'.");
+  return false;
  }
+}
 
- // 3. Última tentativa: abrir o conteúdo como arquivo JSON em uma nova aba.
- // Não chama copiar/colar automaticamente.
- try{
-  const blob=new Blob([conteudo],{type:"application/json;charset=utf-8"});
-  const url=URL.createObjectURL(blob);
-  const novaAba=window.open(url,"_blank");
-  if(novaAba){
-   mostrarToast("Backup aberto. Use o menu do navegador para salvar o arquivo.");
-   setTimeout(()=>URL.revokeObjectURL(url),60000);
-   return;
-  }
-  URL.revokeObjectURL(url);
- }catch(erroAba){
-  console.error("Não foi possível abrir o backup:",erroAba);
- }
-
- mostrarToast("O navegador bloqueou o download. Use 'Copiar texto do backup' para guardar uma cópia.");
+function exportarDados(){
+ // Mantém compatibilidade com qualquer parte do app que ainda chame o nome antigo.
+ return salvarBackupArquivo();
 }
 
 function copiarTextoBackupDireto(){
