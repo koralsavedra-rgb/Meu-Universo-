@@ -505,6 +505,21 @@ font-size:28px;
 line-height:1.15;
 margin:0
 }
+
+.personagem-leitura-card{background:white;border:1px solid var(--linha);border-radius:20px;padding:17px;box-shadow:0 5px 18px rgba(23,21,25,.035)}
+.personagem-leitura-tipo{font-size:11px;color:var(--texto-suave);margin-bottom:18px}
+.personagem-leitura-secao{padding:15px 0;border-top:1px solid var(--linha)}
+.personagem-leitura-secao:first-of-type{border-top:0;padding-top:0}
+.personagem-leitura-secao h2{font-size:13px;margin:0 0 8px}
+.personagem-leitura-conteudo{font-size:13px;line-height:1.7;color:#4f494f;white-space:normal;overflow-wrap:anywhere}
+.personagem-leitura-vazio{font-size:11px;color:var(--texto-suave);line-height:1.5;background:#f8f4f6;border-radius:12px;padding:10px}
+.personagem-leitura-atributos{display:grid;gap:7px}
+.personagem-leitura-atributo{display:flex;justify-content:space-between;gap:12px;padding:10px 11px;background:#faf7f8;border-radius:12px;font-size:11px}
+.personagem-leitura-atributo strong{font-weight:650;text-align:right}
+.personagem-leitura-relacionamento{padding:10px 11px;border:1px solid var(--linha);border-radius:12px;margin-bottom:7px;font-size:11px;line-height:1.5;color:var(--texto-suave)}
+.personagem-leitura-relacionamento .conexao-link{font-size:12px;margin-bottom:2px}
+.personagem-leitura-acoes{padding-top:16px}
+.personagem-leitura-acoes .btn{width:100%}
 .editor-personagem-card{
 background:white;
 border:1px solid var(--linha);
@@ -2354,6 +2369,7 @@ let abaHistoriaAtual="visao-geral";
 let capituloAberto=null;
 let temporizadorSalvamentoCapitulo=null;
 let personagemEditando=null;
+let personagemVisualizando=null;
 let mostrandoFormularioRelacionamento=false;
 let localEditando=null;
 let eventoEditando=null;
@@ -5052,8 +5068,8 @@ String(idPersonagem)
 if(!personagem)return;
 historiaAberta=
 historia.id;
-personagemEditando=
-personagem.id;
+personagemVisualizando=personagem.id;
+personagemEditando=null;
 mostrarTela(
 "editorPersonagem"
 )
@@ -5074,6 +5090,10 @@ return
 }
 if(!Array.isArray(historia.personagens)){
 historia.personagens=[]
+}
+if(personagemVisualizando!==null && personagemEditando===null){
+renderizarVisualizacaoPersonagem(historia);
+return
 }
 let personagem=null;
 if(personagemEditando!==null){
@@ -5248,6 +5268,45 @@ Salvar personagem
 </div>
 `
 }
+function renderizarVisualizacaoPersonagem(historia){
+const area=document.getElementById("conteudoEditorPersonagem");
+if(!area)return;
+const personagem=historia.personagens.find(item=>String(item.id)===String(personagemVisualizando));
+if(!personagem){personagemVisualizando=null;mostrarTela("dentroHistoria");return}
+const nome=personagem.nome&&personagem.nome.trim()?personagem.nome:"Sem nome";
+const tipo=personagem.tipo&&personagem.tipo.trim()?personagem.tipo:"Sem tipo";
+const atributos=normalizarAtributos(personagem.atributos||[]).filter(a=>a.nome||a.valor);
+const relacionamentos=Array.isArray(personagem.relacionamentos)?personagem.relacionamentos:[];
+const outros=historia.personagens;
+const relHtml=relacionamentos.length?relacionamentos.map(rel=>{
+const outro=outros.find(item=>String(item.id)===String(rel.personagemRelacionadoId));
+if(!outro)return"";
+const nomeOutro=outro.nome&&outro.nome.trim()?outro.nome:"Sem nome";
+const desc=rel.descricao&&rel.descricao.trim()?rel.descricao:"Relação sem descrição.";
+return `<div class="personagem-leitura-relacionamento"><button type="button" class="conexao-link" onclick='abrirPersonagem(${JSON.stringify(historia.id)},${JSON.stringify(outro.id)})'>${escapar(nomeOutro)}</button><div>${escapar(desc)}</div></div>`
+}).join(""): `<div class="personagem-leitura-vazio">Nenhum relacionamento cadastrado.</div>`;
+const sec=(titulo,conteudo)=>`<div class="personagem-leitura-secao"><h2>${titulo}</h2><div class="personagem-leitura-conteudo">${escapar(conteudo).replace(/\n/g,"<br>")}</div></div>`;
+area.innerHTML=`
+<div class="editor-personagem-cabecalho">
+<button class="btn btn-voltar" onclick="voltarParaPersonagens()">← Voltar para personagens</button>
+<h1 class="editor-personagem-titulo">${escapar(nome)}</h1>
+</div>
+<div class="personagem-leitura-card">
+<div class="personagem-leitura-tipo">${escapar(tipo)}</div>
+${personagem.personalidade?sec("Personalidade",personagem.personalidade):""}
+${personagem.aparencia?sec("Aparência",personagem.aparencia):""}
+${personagem.objetivos?sec("Objetivos",personagem.objetivos):""}
+<div class="personagem-leitura-secao"><h2>🏷️ Atributos</h2>${atributos.length?`<div class="personagem-leitura-atributos">${atributos.map(a=>`<div class="personagem-leitura-atributo"><div>${escapar(a.nome||"Atributo")}</div><strong>${escapar(a.valor||"—")}</strong></div>`).join("")}</div>`:`<div class="personagem-leitura-vazio">Nenhum atributo cadastrado.</div>`}</div>
+<div class="personagem-leitura-secao"><h2>Relacionamentos</h2>${relHtml}</div>
+<div class="personagem-leitura-acoes"><button class="btn btn-principal" onclick="editarPersonagemVisualizado()">✎ Editar personagem</button></div>
+</div>`;
+}
+function editarPersonagemVisualizado(){
+if(personagemVisualizando===null)return;
+personagemEditando=personagemVisualizando;
+personagemVisualizando=null;
+mostrarTela("editorPersonagem");
+}
 function verificarTipoPersonagemPersonalizado(){
 const tipo=
 document.getElementById(
@@ -5355,6 +5414,7 @@ TIPOS_ITEM.HISTORIA,
 historia.id
 );
 personagemEditando=null;
+personagemVisualizando=null;
 abaHistoriaAtual=
 "personagens";
 mostrarTela(
@@ -5413,6 +5473,7 @@ mostrarTela(
 function cancelarPersonagem(){
 mostrandoFormularioRelacionamento=false;
 personagemEditando=null;
+personagemVisualizando=null;
 abaHistoriaAtual=
 "personagens";
 mostrarTela(
