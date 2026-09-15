@@ -2279,17 +2279,24 @@ frequência para não correr o risco de perder tudo.
 Compartilha ou copia um arquivo com tudo: histórias, universos,
 personagens, locais, eventos, jornadas, lembretes, pontos, XP e conquistas.
 </div>
-<div style="display:flex;gap:7px;margin-top:12px">
+<div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
 <button
 class="btn btn-principal"
-style="flex:1"
+style="flex:1;min-width:180px"
 onclick="exportarDados()"
 >
 Baixar/Compartilhar arquivo
 </button>
 <button
 class="btn"
-style="flex:1"
+style="flex:1;min-width:180px"
+onclick="compartilharTextoBackupDireto()"
+>
+Compartilhar como texto
+</button>
+<button
+class="btn"
+style="flex:1;min-width:180px"
 onclick="copiarTextoBackupDireto()"
 >
 Copiar texto do backup
@@ -14039,22 +14046,7 @@ async function exportarDados(){
  console.error("Não foi possível preparar o arquivo de backup:",erroArquivo)
  }
 
- // 2. Se o compartilhamento de arquivo não funcionar, tentar compartilhar apenas o texto.
- try{
- if(navigator.share){
- await navigator.share({
- text:conteudo,
- title:"Backup Meu Universo"
- });
- mostrarToast("Backup compartilhado.");
- return
- }
- }catch(erroCompartilharTexto){
- if(erroCompartilharTexto&&erroCompartilharTexto.name==="AbortError")return;
- console.error("Não foi possível compartilhar o backup como texto:",erroCompartilharTexto)
- }
-
- // 3. Tentar baixar usando uma URI data:.
+ // 2. Se o compartilhamento de arquivo não funcionar, tentar baixar usando uma URI data:.
  try{
  const bytes=new TextEncoder().encode(conteudo);
  let binario="";
@@ -14076,8 +14068,28 @@ async function exportarDados(){
  console.error("Não foi possível baixar o backup pela URI data:",erroDownloadData)
  }
 
- // As três tentativas falharam: não abrir automaticamente o modo copiar/colar.
+ // As tentativas do botão de arquivo falharam. Não abrir automaticamente
+ // nenhum dos outros modos de backup: cada botão é independente.
  mostrarToast("Não foi possível gerar o arquivo. Use o botão de copiar/colar abaixo.");
+}
+
+async function compartilharTextoBackupDireto(){
+ const conteudo=gerarConteudoBackup();
+ const LIMITE_BACKUP_TEXTO=150000;
+ if(conteudo.length>LIMITE_BACKUP_TEXTO){
+   mostrarToast("Backup grande — prefira destinos como Google Drive; apps de mensagem podem cortar o texto.");
+ }
+ try{
+   if(!navigator.share)throw new Error("Web Share API indisponível");
+   await navigator.share({
+     text:conteudo,
+     title:"Backup Meu Universo"
+   });
+   mostrarToast("Compartilhamento aberto.");
+ }catch(erroCompartilharTexto){
+   console.error("Não foi possível abrir o compartilhamento como texto:",erroCompartilharTexto);
+   mostrarToast("Não foi possível abrir o compartilhamento. Use copiar/colar abaixo.");
+ }
 }
 
 function copiarTextoBackupDireto(){
