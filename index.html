@@ -2784,9 +2784,11 @@ let conexoesModo="lista";
 let conexoesModoUniverso="lista";
 let dadosUniversos={};
 let universoAberto=null;
+let universoEditando=false;
 let abaUniversoAtual="visao-geral";
 let personagensUniversos={};
 let personagemUniversoEditando=null;
+let personagemUniversoVisualizando=null;
 let mostrandoFormularioRelacionamentoUniverso=false;
 let locaisUniversos={};
 let localUniversoEditando=null;
@@ -3302,6 +3304,21 @@ regrasLista:[],
 atualizadoEm:0
 }
 }
+function gerarLeituraCampoUniverso(titulo,valor){
+const texto=String(valor??"").trim();
+return`<div class="detalhe-bloco"><div class="meta">${escapar(titulo)}</div><div class="descricao">${texto?escapar(texto).replace(/\n/g,"<br>"):"Nenhuma informação registrada."}</div></div>`
+}
+function editarUniversoVisualizado(){
+if(universoAberto===null)return;
+universoEditando=true;
+renderizarUniversoDetalhe();
+window.scrollTo({top:0,behavior:"smooth"})
+}
+function cancelarEdicaoUniverso(){
+universoEditando=false;
+renderizarUniversoDetalhe()
+}
+
 function salvarDadosDoUniverso(){
 if(universoAberto===null)return;
 const campos=[
@@ -3328,6 +3345,7 @@ dados.atualizadoEm
 estado.atualizadoEm=dados.atualizadoEm;
 salvarEstadoItens();
 renderizarTudo();
+universoEditando=false;
 renderizarUniversoDetalhe();
 mostrarToast("Alterações do universo salvas.");
 }
@@ -8446,6 +8464,7 @@ const mapa=obterMapaUniversos();
 const universo=mapa[chave];
 if(!universo)return;
 universoAberto=chave;
+universoEditando=false;
 abaUniversoAtual="visao-geral";
 marcarComoRecente(
 TIPOS_ITEM.UNIVERSO,
@@ -8455,6 +8474,7 @@ mostrarTela("dentroUniverso");
 }
 function voltarParaUniversos(){
 universoAberto=null;
+universoEditando=false;
 abaUniversoAtual="visao-geral";
 mostrarTela("universos");
 }
@@ -8537,61 +8557,33 @@ class="conteudo-aba-detalhe ${abaUniversoAtual==="visao-geral"?"ativa":""}"
 <h2>Visão geral</h2>
 <div class="formulario-universo">
 <div class="aviso-formulario">
-✦ Este espaço pertence ao mundo. O nome do universo continua vindo das histórias que usam este universo.
+✦ Este espaço pertence ao mundo. Leia as informações do universo aqui. Para alterar qualquer uma delas, use Editar.
 </div>
+${universoEditando?`
 <label for="campoDescricaoUniverso">Descrição</label>
-<textarea
-id="campoDescricaoUniverso"
-placeholder="Como é este mundo? O que o define?"
->${escapar(dados.descricao)}</textarea>
+<textarea id="campoDescricaoUniverso" placeholder="Como é este mundo? O que o define?">${escapar(dados.descricao)}</textarea>
 <label for="campoRegrasUniverso">Regras</label>
-<textarea
-id="campoRegrasUniverso"
-placeholder="Regras do mundo, da magia, da física ou outras leis importantes..."
->${escapar(dados.regras)}</textarea>
+<textarea id="campoRegrasUniverso" placeholder="Regras do mundo, da magia, da física ou outras leis importantes...">${escapar(dados.regras)}</textarea>
 <label for="campoGeopoliticaUniverso">Geopolítica</label>
-<textarea
-id="campoGeopoliticaUniverso"
-placeholder="Países, territórios, fronteiras, poderes e relações..."
->${escapar(dados.geopolitica)}</textarea>
+<textarea id="campoGeopoliticaUniverso" placeholder="Países, territórios, fronteiras, poderes e relações...">${escapar(dados.geopolitica)}</textarea>
 <label for="campoClimaUniverso">Clima</label>
-<textarea
-id="campoClimaUniverso"
-placeholder="Climas, estações, fenômenos naturais e características do ambiente..."
->${escapar(dados.clima)}</textarea>
+<textarea id="campoClimaUniverso" placeholder="Climas, estações, fenômenos naturais e características do ambiente...">${escapar(dados.clima)}</textarea>
 <label for="campoCulturaUniverso">Cultura</label>
-<textarea
-id="campoCulturaUniverso"
-placeholder="Costumes, crenças, tradições, modos de vida e aspectos culturais..."
->${escapar(dados.cultura)}</textarea>
+<textarea id="campoCulturaUniverso" placeholder="Costumes, crenças, tradições, modos de vida e aspectos culturais...">${escapar(dados.cultura)}</textarea>
 <label for="campoMagiaUniverso">Magia</label>
-<textarea
-id="campoMagiaUniverso"
-placeholder="Como a magia funciona, quem pode usá-la, limites e particularidades..."
->${escapar(dados.magia)}</textarea>
+<textarea id="campoMagiaUniverso" placeholder="Como a magia funciona, quem pode usá-la, limites e particularidades...">${escapar(dados.magia)}</textarea>
+`:`${gerarLeituraCampoUniverso("Descrição",dados.descricao)}
+${gerarLeituraCampoUniverso("Regras",dados.regras)}
+${gerarLeituraCampoUniverso("Geopolítica",dados.geopolitica)}
+${gerarLeituraCampoUniverso("Clima",dados.clima)}
+${gerarLeituraCampoUniverso("Cultura",dados.cultura)}
+${gerarLeituraCampoUniverso("Magia",dados.magia)}`}
 <div class="universo-detalhe-acoes">
-<button
-class="btn"
-onclick='alternarArquivoUniverso(${JSON.stringify(chave)})'
->
-${arquivado?"Desarquivar":"Arquivar"}
-</button>
-<button
-class="btn btn-favorito ${favorito?"ativo":""}"
-onclick='alternarFavoritoUniverso(${JSON.stringify(chave)})'
->
-${favorito?"♥ Favorito":"♡ Favoritar"}
-</button>
-<button
-class="btn btn-principal"
-onclick="salvarDadosDoUniverso()"
->
-Salvar alterações
-</button>
+<button class="btn" onclick='alternarArquivoUniverso(${JSON.stringify(chave)})'>${arquivado?"Desarquivar":"Arquivar"}</button>
+<button class="btn btn-favorito ${favorito?"ativo":""}" onclick='alternarFavoritoUniverso(${JSON.stringify(chave)})'>${favorito?"♥ Favorito":"♡ Favoritar"}</button>
+${universoEditando?`<button class="btn" onclick="cancelarEdicaoUniverso()">Cancelar</button><button class="btn btn-principal" onclick="salvarDadosDoUniverso()">Salvar alterações</button>`:`<button class="btn btn-principal" onclick="editarUniversoVisualizado()">✎ Editar universo</button>`}
 </div>
-<div class="aviso-ficha-universo">
-As alterações ficam salvas separadamente das histórias deste universo.
-</div>
+<div class="aviso-ficha-universo">As alterações ficam salvas separadamente das histórias deste universo.</div>
 </div>
 </div>
 </div>
@@ -9993,6 +9985,7 @@ function novoPersonagemUniverso(chave){
 if(!obterMapaUniversos()[chave])return;
 universoAberto=chave;
 personagemUniversoEditando=null;
+personagemUniversoVisualizando=null;
 mostrandoFormularioRelacionamentoUniverso=false;
 mostrarTela("editorPersonagemUniverso");
 setTimeout(()=>document.getElementById("campoNomePersonagemUniverso")?.focus(),100)
@@ -10002,9 +9995,44 @@ const personagens=obterPersonagensUniverso(chave);
 const personagem=personagens.find(item=>String(item.id)===String(idPersonagem));
 if(!personagem)return;
 universoAberto=chave;
-personagemUniversoEditando=personagem.id;
+personagemUniversoEditando=null;
+personagemUniversoVisualizando=personagem.id;
 mostrandoFormularioRelacionamentoUniverso=false;
 mostrarTela("editorPersonagemUniverso")
+}
+function renderizarLeituraPersonagemUniverso(personagem){
+const area=document.getElementById("conteudoEditorPersonagemUniverso");
+if(!area)return;
+const nome=personagem.nome&&personagem.nome.trim()?personagem.nome:"Sem nome";
+const tipo=personagem.tipo&&personagem.tipo.trim()?personagem.tipo:"Sem tipo";
+const atributos=Array.isArray(personagem.atributos)?personagem.atributos:[];
+const relacionamentos=Array.isArray(personagem.relacionamentos)?personagem.relacionamentos:[];
+const outrosPersonagens=obterPersonagensUniverso(universoAberto).filter(item=>String(item.id)!==String(personagem.id));
+const sec=(titulo,conteudo)=>conteudo&&String(conteudo).trim()?`<div class="personagem-leitura-secao"><h2>${escapar(titulo)}</h2><div class="personagem-leitura-conteudo">${escapar(conteudo).replace(/\n/g,"<br>")}</div></div>`:"";
+const relHtml=relacionamentos.length?relacionamentos.map(relacionamento=>{
+const relacionado=outrosPersonagens.find(item=>String(item.id)===String(relacionamento.personagemRelacionadoId));
+if(!relacionado)return"";
+const nomeRelacionado=relacionado.nome&&relacionado.nome.trim()?relacionado.nome:"Sem nome";
+const descricao=relacionamento.descricao&&relacionamento.descricao.trim()?relacionamento.descricao:"Relação sem descrição.";
+return`<div class="personagem-leitura-relacionamento"><button type="button" class="conexao-link" onclick='abrirPersonagemUniverso(${JSON.stringify(universoAberto)},${JSON.stringify(relacionado.id)})'>${escapar(nomeRelacionado)}</button><div>${escapar(descricao)}</div></div>`
+}).join(""):`<div class="personagem-leitura-vazio">Nenhum relacionamento cadastrado.</div>`;
+area.innerHTML=`
+<div class="editor-personagem-cabecalho"><button class="btn btn-voltar" onclick="voltarParaPersonagensUniverso()">← Voltar para personagens</button><h1 class="editor-personagem-universo-titulo">${escapar(nome)}</h1></div>
+<div class="personagem-leitura-card">
+<div class="personagem-leitura-tipo">${escapar(tipo)}</div>
+${sec("Personalidade",personagem.personalidade)}
+${sec("Aparência",personagem.aparencia)}
+${sec("Objetivos",personagem.objetivos)}
+<div class="personagem-leitura-secao"><h2>🏷️ Atributos</h2>${atributos.length?`<div class="personagem-leitura-atributos">${atributos.map(a=>`<div class="personagem-leitura-atributo"><div>${escapar(a.nome||"Atributo")}</div><strong>${escapar(a.valor||"—")}</strong></div>`).join("")}</div>`:`<div class="personagem-leitura-vazio">Nenhum atributo cadastrado.</div>`}</div>
+<div class="personagem-leitura-secao"><h2>Relacionamentos</h2>${relHtml}</div>
+<div class="personagem-leitura-acoes"><button class="btn btn-principal" onclick="editarPersonagemUniversoVisualizado()">✎ Editar personagem</button></div>
+</div>`;
+}
+function editarPersonagemUniversoVisualizado(){
+if(personagemUniversoVisualizando===null)return;
+personagemUniversoEditando=personagemUniversoVisualizando;
+personagemUniversoVisualizando=null;
+mostrarTela("editorPersonagemUniverso");
 }
 function renderizarEditorPersonagemUniverso(){
 const area=document.getElementById("conteudoEditorPersonagemUniverso");
@@ -10014,6 +10042,12 @@ mostrarTela("universos");
 return
 }
 const personagens=obterPersonagensUniverso(universoAberto);
+if(personagemUniversoVisualizando!==null){
+const personagemVisualizado=personagens.find(item=>String(item.id)===String(personagemUniversoVisualizando));
+if(!personagemVisualizado){personagemUniversoVisualizando=null;mostrarTela("dentroUniverso");return}
+renderizarLeituraPersonagemUniverso(personagemVisualizado);
+return
+}
 let personagem=null;
 if(personagemUniversoEditando!==null){
 personagem=personagens.find(item=>String(item.id)===String(personagemUniversoEditando))
@@ -10108,6 +10142,7 @@ const existente=personagens[indice];
 personagens[indice]={...existente,nome,tipo,personalidade,aparencia,objetivos,atributos:lerAtributos("listaAtributosPersonagemUniverso"),relacionamentos:Array.isArray(existente.relacionamentos)?existente.relacionamentos:[],atualizadoEm:agora};
 salvarPersonagensUniversos();
 personagemUniversoEditando=null;
+personagemUniversoVisualizando=null;
 mostrandoFormularioRelacionamentoUniverso=false;
 abaUniversoAtual="personagens";
 mostrarTela("dentroUniverso");
@@ -10118,6 +10153,7 @@ return
 personagens.unshift({id:gerarIdPersonagem(),nome,tipo,personalidade,aparencia,objetivos,atributos:lerAtributos("listaAtributosPersonagemUniverso"),relacionamentos:[],criadoEm:agora,atualizadoEm:agora});
 salvarPersonagensUniversos();
 personagemUniversoEditando=null;
+personagemUniversoVisualizando=null;
 mostrandoFormularioRelacionamentoUniverso=false;
 abaUniversoAtual="personagens";
 mostrarTela("dentroUniverso");
@@ -10125,6 +10161,7 @@ mostrarToast("Personagem do universo salvo.")
 }
 function voltarParaPersonagensUniverso(){
 personagemUniversoEditando=null;
+personagemUniversoVisualizando=null;
 mostrandoFormularioRelacionamentoUniverso=false;
 abaUniversoAtual="personagens";
 mostrarTela("dentroUniverso")
@@ -10148,6 +10185,7 @@ salvarPersonagensUniversos();
 limparReferenciasLocaisUniversoAoExcluirPersonagem(universoAberto,idExcluido);
 limparReferenciasEventosUniversoAoExcluirPersonagem(universoAberto,idExcluido);
 personagemUniversoEditando=null;
+personagemUniversoVisualizando=null;
 mostrandoFormularioRelacionamentoUniverso=false;
 abaUniversoAtual="personagens";
 mostrarTela("dentroUniverso");
