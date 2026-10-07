@@ -1606,6 +1606,17 @@ min-width:120px
 .linha-atributo .btn-remover-atributo{flex-shrink:0;width:38px;height:38px;padding:0;border-radius:10px}
 .acoes-atributos{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
 .acoes-atributos .btn{flex:1;min-width:130px}
+.lista-regras{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.linha-regra{display:flex;flex-direction:column;gap:7px;padding:10px;border:1px solid var(--linha);border-radius:12px}
+.linha-regra-topo{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:center}
+.linha-regra-topo input{min-width:0;font-weight:600}
+.linha-regra textarea{min-height:84px;resize:vertical}
+.linha-regra select{min-width:0;width:100%}
+.linha-regra.inquebravel{border-color:var(--rosa);background:var(--rosa-claro)}
+.linha-regra-opcoes{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.linha-regra .regra-inquebravel{display:flex;align-items:center;gap:6px;margin:0;font-size:11px;font-weight:700;white-space:nowrap;cursor:pointer}
+.linha-regra .regra-inquebravel input{width:18px;height:18px;padding:0;margin:0;accent-color:var(--rosa);flex-shrink:0}
+.linha-regra .btn-remover-atributo{flex-shrink:0;width:38px;height:38px;padding:0;border-radius:10px}
 .atributos-vazio{font-size:11px;color:var(--texto-suave);line-height:1.45;background:#f8f4f6;border-radius:12px;padding:11px;margin-top:9px}
 
 
@@ -3177,7 +3188,8 @@ const dados=dadosUniversos[chave];
 if(dados&&typeof dados==="object"&&!Array.isArray(dados)){
 dadosUniversos[chave]={
 ...dados,
-atributos:normalizarAtributos(dados.atributos)
+atributos:normalizarAtributos(dados.atributos),
+regrasLista:normalizarRegras(dados.regrasLista)
 }
 }
 });
@@ -3274,6 +3286,7 @@ clima:typeof dados.clima==="string"?dados.clima:"",
 cultura:typeof dados.cultura==="string"?dados.cultura:"",
 magia:typeof dados.magia==="string"?dados.magia:"",
 atributos:normalizarAtributos(dados.atributos),
+regrasLista:normalizarRegras(dados.regrasLista),
 atualizadoEm:Number(dados.atualizadoEm)||0
 }
 }
@@ -3285,6 +3298,7 @@ clima:"",
 cultura:"",
 magia:"",
 atributos:[],
+regrasLista:[],
 atualizadoEm:0
 }
 }
@@ -3716,6 +3730,8 @@ eventos,
 arquivos,
 atributos:
 normalizarAtributos(historia.atributos),
+regrasLista:
+normalizarRegras(historia.regrasLista),
 atualizadoEm:
 Number(historia.atualizadoEm)||
 Date.now(),
@@ -3746,6 +3762,91 @@ return lista.filter(Boolean).map(atributo=>({
 nome:typeof atributo.nome==="string"?atributo.nome:"",
 valor:typeof atributo.valor==="string"?atributo.valor:""
 })).filter(atributo=>atributo.nome.trim()!==""||atributo.valor.trim()!=="")
+}
+const TIPOS_REGRA=["Mundo","Cidade","Magia","Personagem","Sociedade","Narrativa","Outro"];
+function normalizarRegras(lista){
+if(!Array.isArray(lista))return[];
+return lista.filter(Boolean).map(regra=>({
+tipo:typeof regra.tipo==="string"&&regra.tipo.trim()!==""?regra.tipo:"Outro",
+titulo:typeof regra.titulo==="string"?regra.titulo:"",
+descricao:typeof regra.descricao==="string"?regra.descricao:"",
+inquebravel:regra.inquebravel===true
+})).filter(regra=>regra.titulo.trim()!==""||regra.descricao.trim()!=="")
+}
+function gerarLinhaRegra(titulo="",descricao="",tipo="Mundo",inquebravel=false){
+const opcoesTipo=TIPOS_REGRA.includes(tipo)?TIPOS_REGRA:[...TIPOS_REGRA,tipo];
+return `<div class="linha-regra${inquebravel?" inquebravel":""}" data-linha-regra>
+<div class="linha-regra-topo">
+<input type="text" data-regra-titulo value="${escapar(titulo)}" placeholder="Nome da regra" autocomplete="off">
+<button type="button" class="btn btn-perigo btn-remover-atributo" onclick="this.closest('[data-linha-regra]').remove()" aria-label="Remover regra" title="Remover regra">×</button>
+</div>
+<div class="linha-regra-opcoes">
+<select data-regra-tipo aria-label="Tipo de regra">${opcoesTipo.map(t=>`<option value="${escapar(t)}"${t===tipo?" selected":""}>${escapar(t==="Outro"?"Outro tipo":"Regra de "+(t==="Mundo"?"mundo":t==="Cidade"?"cidade":t==="Magia"?"magia":t==="Personagem"?"personagem":t==="Sociedade"?"sociedade":t==="Narrativa"?"narrativa":t))}</option>`).join("")}</select>
+<label class="regra-inquebravel"><input type="checkbox" data-regra-inquebravel${inquebravel?" checked":""} onchange="this.closest('[data-linha-regra]').classList.toggle('inquebravel',this.checked)"> 🔒 Inquebrável</label>
+</div>
+<textarea data-regra-descricao placeholder="Como essa regra funciona? Limites, exceções, consequências...">${escapar(descricao)}</textarea>
+</div>`
+}
+function adicionarLinhaRegra(idLista){
+const lista=document.getElementById(idLista);
+if(!lista)return;
+lista.insertAdjacentHTML("beforeend",gerarLinhaRegra());
+const linhas=lista.querySelectorAll("[data-linha-regra]");
+const ultima=linhas[linhas.length-1];
+const campo=ultima?ultima.querySelector("[data-regra-titulo]"):null;
+if(campo)campo.focus()
+}
+function lerRegras(idLista){
+const lista=document.getElementById(idLista);
+if(!lista)return[];
+return Array.from(lista.querySelectorAll("[data-linha-regra]")).map(linha=>({
+tipo:(linha.querySelector("[data-regra-tipo]")||{value:"Outro"}).value||"Outro",
+titulo:(linha.querySelector("[data-regra-titulo]")||{value:""}).value.trim(),
+descricao:(linha.querySelector("[data-regra-descricao]")||{value:""}).value.trim(),
+inquebravel:!!(linha.querySelector("[data-regra-inquebravel]")||{checked:false}).checked
+})).filter(regra=>regra.titulo!==""||regra.descricao!=="")
+}
+function gerarConteudoRegras(regras,tipo,chave){
+const idLista=tipo==="historia"?"listaRegrasHistoria":"listaRegrasUniverso";
+const lista=normalizarRegras(regras);
+const alvo=tipo==="historia"?"desta história":"deste universo";
+return `<div class="detalhe-secao">
+<h2>📜 Regras</h2>
+<div class="formulario-universo">
+<div class="aviso-formulario">✦ Registre as regras ${alvo}: leis do mundo, limites da magia, costumes, ou regras de escrita que você quer manter. Cada regra tem um nome e uma explicação.</div>
+<div class="lista-regras" id="${idLista}">${lista.map(regra=>gerarLinhaRegra(regra.titulo,regra.descricao,regra.tipo,regra.inquebravel)).join("")}</div>
+<div class="acoes-atributos">
+<button type="button" class="btn" onclick="adicionarLinhaRegra('${idLista}')">＋ Adicionar regra</button>
+<button type="button" class="btn btn-principal" onclick="salvarRegras('${tipo}',${escapar(JSON.stringify(chave))})">Salvar regras</button>
+</div>
+</div>
+</div>`
+}
+function salvarRegras(tipo,chave){
+if(tipo==="historia"){
+const historia=historias.find(item=>String(item.id)===String(chave));
+if(!historia)return;
+historia.regrasLista=lerRegras("listaRegrasHistoria");
+historia.atualizadoEm=Date.now();
+salvarDados();
+marcarComoRecente(TIPOS_ITEM.HISTORIA,historia.id);
+mostrarToast("Regras da história salvas.");
+renderizarHistoriaDetalhe();
+return
+}
+if(tipo==="universo"){
+if(chave===null||chave===undefined)return;
+const dados=obterDadosUniverso(chave);
+dados.regrasLista=lerRegras("listaRegrasUniverso");
+dados.atualizadoEm=Date.now();
+dadosUniversos[chave]=dados;
+salvarDadosUniversos();
+const estado=garantirEstadoItem(TIPOS_ITEM.UNIVERSO,chave,dados.atualizadoEm);
+estado.atualizadoEm=dados.atualizadoEm;
+salvarEstadoItens();
+mostrarToast("Regras do universo salvas.");
+renderizarUniversoDetalhe();
+}
 }
 function gerarListaAtributos(atributos=[],prefixo="atributo"){
 const lista=normalizarAtributos(atributos);
@@ -4328,6 +4429,10 @@ const abas=[
 "📁Arquivos"
 ],
 [
+"regras",
+"📜 Regras"
+],
+[
 "atributos",
 "🏷️ Atributos"
 ]
@@ -4347,6 +4452,8 @@ conexoes:
 gerarConteudoConexoes(historia),
 arquivos:
 gerarConteudoArquivos(historia),
+regras:
+gerarConteudoRegras(historia.regrasLista,"historia",historia.id),
 atributos:
 gerarConteudoAtributos(historia.atributos,"historia",historia.id)
 };
@@ -8386,6 +8493,7 @@ const abas=[
 ["cronologia","🕰️ Cronologia"],
 ["ideias","💡 Ideias"],
 ["conexoes","🔗 Conexões"],
+["regras","📜 Regras"],
 ["atributos","🏷️ Atributos"]
 ];
 area.innerHTML=`
@@ -8548,6 +8656,11 @@ ${gerarConteudoIdeiasUniverso(chave)}
 class="conteudo-aba-detalhe ${abaUniversoAtual==="conexoes"?"ativa":""}"
 >
 ${gerarConteudoConexoesUniverso(chave)}
+</div>
+<div
+class="conteudo-aba-detalhe ${abaUniversoAtual==="regras"?"ativa":""}"
+>
+${gerarConteudoRegras(dados.regrasLista,"universo",chave)}
 </div>
 <div
 class="conteudo-aba-detalhe ${abaUniversoAtual==="atributos"?"ativa":""}"
@@ -12655,6 +12768,7 @@ return aplicarConclusaoMeta(jornada,fase,meta,concluida)
 
 
 function gerarIdLembrete(){return String(Date.now())+"-"+Math.random().toString(36).slice(2,9)}
+function gerarIdFuturo(){return String(Date.now())+"-"+Math.random().toString(36).slice(2,9)}
 
 function obterDataHojeLocalISO(){
 const agora=new Date();
