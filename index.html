@@ -8171,18 +8171,24 @@ const textoArquivo=
 arquivada?
 "Desarquivar":
 "Arquivar";
-const botaoArquivo=
-opcoes&&
-opcoes.mostrarArquivo===false?
-"":
+const acoesHTML=
+opcoes.mostrarAcoes===true?
 `
+<div class="acoes">
 <button
 class="btn"
 onclick="event.stopPropagation();alternarArquivoHistoria(${historia.id})"
 >
 ${textoArquivo}
 </button>
-`;
+<button
+class="btn btn-perigo"
+onclick="event.stopPropagation();excluirHistoria(${historia.id})"
+>
+Excluir
+</button>
+</div>`:
+"";
 return`
 <article
 class="card"
@@ -8237,21 +8243,7 @@ ${escapar(historia.categoria)}
 ${ideiasHTML}
 </div>
 ${tagsHTML}
-<div class="acoes">
-<button
-class="btn"
-onclick="event.stopPropagation();editarHistoria(${historia.id})"
->
-Editar
-</button>
-${botaoArquivo}
-<button
-class="btn btn-perigo"
-onclick="event.stopPropagation();excluirHistoria(${historia.id})"
->
-Excluir
-</button>
-</div>
+${acoesHTML}
 </article>
 `
 }
@@ -10720,7 +10712,7 @@ r=>
 r.tipo===TIPOS_ITEM.HISTORIA?
 gerarCardHistoria(
 r.item,
-{mostrarArquivo:true}
+{mostrarAcoes:true}
 ):
 gerarCardUniversoArquivado(
 r.item
