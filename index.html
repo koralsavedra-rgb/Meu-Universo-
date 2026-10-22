@@ -3832,7 +3832,8 @@ return lista.filter(Boolean).map(regra=>({
 tipo:typeof regra.tipo==="string"&&regra.tipo.trim()!==""?regra.tipo:"Outro",
 titulo:typeof regra.titulo==="string"?regra.titulo:"",
 descricao:typeof regra.descricao==="string"?regra.descricao:"",
-inquebravel:regra.inquebravel===true
+inquebravel:regra.inquebravel===true,
+conexoes:Array.isArray(regra.conexoes)?regra.conexoes.filter(c=>c&&["personagem","local","evento"].includes(c.tipo)&&c.id!==undefined&&c.id!==null).map(c=>({tipo:c.tipo,id:String(c.id)})):[]
 })).filter(regra=>regra.titulo.trim()!==""||regra.descricao.trim()!=="")
 }
 function gerarLinhaRegra(titulo="",descricao="",tipo="Mundo",inquebravel=false){
@@ -3865,7 +3866,8 @@ return Array.from(lista.querySelectorAll("[data-linha-regra]")).map(linha=>({
 tipo:(linha.querySelector("[data-regra-tipo]")||{value:"Outro"}).value||"Outro",
 titulo:(linha.querySelector("[data-regra-titulo]")||{value:""}).value.trim(),
 descricao:(linha.querySelector("[data-regra-descricao]")||{value:""}).value.trim(),
-inquebravel:!!(linha.querySelector("[data-regra-inquebravel]")||{checked:false}).checked
+inquebravel:!!(linha.querySelector("[data-regra-inquebravel]")||{checked:false}).checked,
+conexoes:Array.from(linha.querySelectorAll("[data-regra-conexao]:checked")).map(c=>{const partes=c.value.split("|");return{tipo:partes[0],id:partes.slice(1).join("|")}})
 })).filter(regra=>regra.titulo!==""||regra.descricao!=="")
 }
 const ROTULOS_REGRA={Mundo:"mundo",Cidade:"cidade",Magia:"magia",Personagem:"personagem",Sociedade:"sociedade",Narrativa:"narrativa"};
@@ -3874,6 +3876,27 @@ function gerarConteudoRegras(regras,tipo,chave){
   const lista=normalizarRegras(regras),k=escapar(JSON.stringify(chave)),alvo=tipo==="historia"?"desta história":"deste universo";
   const cards=lista.map((r,i)=>`<div class="regra-card${r.inquebravel?" inquebravel":""}"><div class="regra-card-topo"><span class="regra-tipo">${escapar(rotuloTipoRegra(r.tipo))}</span>${r.inquebravel?'<span class="regra-lacre">🔒 Inquebrável</span>':""}</div><div class="regra-card-titulo">${escapar(r.titulo||"Regra sem nome")}</div>${r.descricao?`<p class="regra-card-desc">${escapar(r.descricao).replace(/\n/g,"<br>")}</p>`:""}<div class="regra-card-acoes"><button type="button" class="btn" onclick="abrirEditorRegra('${tipo}',${k},${i})">Editar</button><button type="button" class="btn btn-perigo" onclick="removerRegra('${tipo}',${k},${i})">Excluir</button></div></div>`).join("");
   return `<div class="detalhe-secao regras-secao"><h2>📜 Regras</h2>${lista.length?cards:`<p class="notice" style="color:var(--texto-suave)">Nenhuma regra registrada ${alvo}.</p>`}<div id="editorRegra_${tipo}"></div><div class="acoes-atributos"><button type="button" class="btn" onclick="abrirEditorRegra('${tipo}',${k},null)">＋ Nova regra</button></div></div>`
+}
+function obterElementosParaConectarRegra(tipo,chave){
+ let h=null,personagens=[],locais=[],eventos=[];
+ if(tipo==="historia") {h=historias.find(x=>String(x.id)===String(chave));personagens=h?.personagens||[];locais=h?.locais||[];eventos=h?.eventos||[];}
+ else {personagens=obterPersonagensUniverso(chave)||[];locais=obterLocaisUniverso(chave)||[];eventos=obterEventosUniverso(chave)||[];}
+ return [...personagens.map(x=>({tipo:"personagem",id:String(x.id),nome:x.nome||"Personagem sem nome",emoji:"👤"})),...locais.map(x=>({tipo:"local",id:String(x.id),nome:x.nome||"Local sem nome",emoji:"📍"})),...eventos.map(x=>({tipo:"evento",id:String(x.id),nome:x.nome||"Evento sem nome",emoji:"🕰️"}))];
+}
+function gerarSelecaoConexoesRegra(tipo,chave,conexoes=[]){
+ const itens=obterElementosParaConectarRegra(tipo,chave),selecionadas=normalizarRegras([{titulo:"x",conexoes}])[0]?.conexoes||[];
+ if(!itens.length)return '<p class="meta">Crie personagens, locais ou eventos para poder conectá-los a esta regra.</p>';
+ return `<div class="regra-vinculos-editor"><strong>Conectar esta regra a:</strong><div class="regra-vinculos-opcoes">${itens.map(item=>`<label><input type="checkbox" data-regra-conexao value="${escapar(item.tipo+"|"+item.id)}"${selecionadas.some(c=>c.tipo===item.tipo&&String(c.id)===item.id)?" checked":""}> ${item.emoji} ${escapar(item.nome)}</label>`).join("")}</div></div>`;
+}
+function abrirElementoConectadoRegra(tipo,chave,elementoTipo,id){
+ if(tipo==="historia"){if(elementoTipo==="personagem")abrirPersonagem(chave,id);else if(elementoTipo==="local")abrirLocal(chave,id);else abrirEvento(chave,id);return;}
+ if(elementoTipo==="personagem")abrirPersonagemUniverso(chave,id);else if(elementoTipo==="local")abrirLocalUniverso(chave,id);else abrirEventoUniverso(chave,id);
+}
+function gerarRegrasConectadas(regras,tipo,chave){
+ const lista=normalizarRegras(regras);if(!lista.length)return "";
+ const grupos={Mundo:"🌍 Mundo",Cidade:"📍 Locais e cidades",Magia:"✨ Magia",Personagem:"👤 Personagens",Sociedade:"🏛️ Sociedade",Narrativa:"🕰️ Narrativa",Outro:"🔗 Outras conexões"};
+ const itens=obterElementosParaConectarRegra(tipo,chave),k=escapar(JSON.stringify(chave));
+ return `<div class="detalhe-secao regras-secao regras-conectadas"><h2>📜 Regras conectadas</h2><p class="meta">Cada regra pode ser ligada individualmente aos personagens, locais e eventos relacionados. Para alterar essas ligações, abra a aba Regras e edite a regra correspondente.</p><div class="lista-regras">${lista.map((r,i)=>{const ligados=(r.conexoes||[]).map(c=>({c,item:itens.find(x=>x.tipo===c.tipo&&String(x.id)===String(c.id))})).filter(x=>x.item);return `<div class="regra-card${r.inquebravel?" inquebravel":""}"><div class="regra-card-topo"><span class="regra-tipo">${escapar(grupos[r.tipo]||rotuloTipoRegra(r.tipo))}</span>${r.inquebravel?'<span class="regra-lacre">🔒 Inquebrável</span>':""}</div><div class="regra-card-titulo">${escapar(r.titulo||"Regra sem nome")}</div>${r.descricao?`<p class="regra-card-desc">${escapar(r.descricao).replace(/\n/g,"<br>")}</p>`:""}<div class="regra-vinculos"><strong>↳ Elementos conectados (${ligados.length})</strong>${ligados.length?ligados.map(x=>`<button type="button" class="btn" onclick='abrirElementoConectadoRegra("${tipo}",${k},"${x.item.tipo}",${JSON.stringify(x.item.id)})'>${x.item.emoji} ${escapar(x.item.nome)}</button>`).join(""):'<span class="meta">Nenhum elemento vinculado ainda.</span>'}</div></div>`}).join("")}</div><button type="button" class="btn" onclick="selecionarAba${tipo==="historia"?"Historia":"Universo"}('regras')">Abrir aba Regras para editar ligações</button></div>`
 }
 function obterListaRegras(tipo,chave){
   if(tipo==="historia"){const h=historias.find(i=>String(i.id)===String(chave));return h?normalizarRegras(h.regrasLista):[]}
@@ -3888,7 +3911,7 @@ function gravarRegras(tipo,chave,lista,msg){
 function abrirEditorRegra(tipo,chave,indice){
   const box=document.getElementById("editorRegra_"+tipo);if(!box)return;
   const r=(indice===null||indice===undefined)?null:obterListaRegras(tipo,chave)[indice];
-  box.innerHTML=`<div class="regra-editor"><div id="editorRegraLinhas_${tipo}">${gerarLinhaRegra(r?r.titulo:"",r?r.descricao:"",r?r.tipo:"Mundo",r?r.inquebravel:false)}</div><div class="acoes-atributos"><button type="button" class="btn" onclick="cancelarEditorRegra('${tipo}')">Cancelar</button><button type="button" class="btn btn-principal" onclick="confirmarEditorRegra('${tipo}',${escapar(JSON.stringify(chave))},${(indice===null||indice===undefined)?"null":indice})">Salvar regra</button></div></div>`;
+  box.innerHTML=`<div class="regra-editor"><div id="editorRegraLinhas_${tipo}">${gerarLinhaRegra(r?r.titulo:"",r?r.descricao:"",r?r.tipo:"Mundo",r?r.inquebravel:false).replace(/<\/div>$/,gerarSelecaoConexoesRegra(tipo,chave,r?r.conexoes:[]) + "</div>")}</div><div class="acoes-atributos"><button type="button" class="btn" onclick="cancelarEditorRegra('${tipo}')">Cancelar</button><button type="button" class="btn btn-principal" onclick="confirmarEditorRegra('${tipo}',${escapar(JSON.stringify(chave))},${(indice===null||indice===undefined)?"null":indice})">Salvar regra</button></div></div>`;
   const c=box.querySelector("[data-regra-titulo]");if(c){c.focus();box.scrollIntoView({block:"center",behavior:"smooth"})}
 }
 function cancelarEditorRegra(tipo){const b=document.getElementById("editorRegra_"+tipo);if(b)b.innerHTML=""}
@@ -4516,6 +4539,10 @@ const abas=[
 "🔗Conexões"
 ],
 [
+"regras",
+"📜 Regras"
+],
+[
 "arquivos",
 "📁Arquivos"
 ],
@@ -4535,7 +4562,8 @@ cronologia:
 gerarConteudoCronologia(historia),
 ideias:
 gerarConteudoIdeias(historia),
-conexoes: gerarConteudoConexoes(historia)+gerarConteudoRegras(historia.regrasLista,"historia",historia.id),
+conexoes: gerarConteudoConexoes(historia)+gerarRegrasConectadas(historia.regrasLista,"historia",historia.id),
+regras: gerarConteudoRegras(historia.regrasLista,"historia",historia.id),
 arquivos:
 gerarConteudoArquivos(historia),
 atributos:
@@ -4602,18 +4630,6 @@ abaHistoriaAtual==="visao-geral"?
 >
 <div class="detalhe-secao">
 <h2>Visão geral</h2>
-<div class="card">
-<div class="meta">
-Descrição
-</div>
-<div class="descricao">
-${
-historia.descricao?
-escapar(historia.descricao):
-"Esta história ainda não tem uma descrição."
-}
-</div>
-</div>
 <div class="card">
 <div class="meta">
 Gêneros
@@ -8568,6 +8584,7 @@ const abas=[
 ["cronologia","🕰️ Cronologia"],
 ["ideias","💡 Ideias"],
 ["conexoes","🔗 Conexões"],
+["regras","📜 Regras"],
 ["atributos","🏷️ Atributos"]
 ];
 area.innerHTML=`
@@ -8702,7 +8719,13 @@ ${gerarConteudoIdeiasUniverso(chave)}
 <div
 class="conteudo-aba-detalhe ${abaUniversoAtual==="conexoes"?"ativa":""}"
 >
-${gerarConteudoConexoesUniverso(chave)}${gerarConteudoRegras(dados.regrasLista,"universo",chave)}
+${gerarConteudoConexoesUniverso(chave)}${gerarRegrasConectadas(dados.regrasLista,"universo",chave)}
+</div>
+
+<div
+class="conteudo-aba-detalhe ${abaUniversoAtual==="regras"?"ativa":""}"
+>
+${gerarConteudoRegras(dados.regrasLista,"universo",chave)}
 </div>
 
 <div
@@ -14851,6 +14874,7 @@ cpAtualizarBloco();
 .regra-tipo{font-size:12px;color:#8a3454;background:var(--rosa-claro);border:1px solid var(--linha);border-radius:999px;padding:2px 10px}
 .regra-lacre{font-size:12px;color:var(--rosa);font-weight:600}
 .regra-card-titulo{font-family:Georgia,serif;font-size:17px;margin-bottom:4px}
+.regra-vinculos{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:12px;padding-top:10px;border-top:1px solid var(--linha)}.regra-vinculos>strong{width:100%;font-size:12px}.regra-vinculos-editor{margin-top:12px;padding:12px;border:1px solid var(--linha);border-radius:12px;background:#fff}.regra-vinculos-opcoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:9px}.regra-vinculos-opcoes label{display:flex;align-items:center;gap:6px;font-size:13px;overflow-wrap:anywhere}.regra-vinculos-opcoes input{accent-color:var(--rosa)}
 .regra-card-desc{margin:0 0 10px;color:var(--texto-suave);line-height:1.5;font-size:14px}
 .regra-card-acoes{display:flex;gap:8px}
 .regra-editor{border:1px dashed var(--rosa);border-radius:16px;padding:12px;margin:10px 0}
