@@ -2200,6 +2200,7 @@ onkeydown="pressionouEnterTag(event)"
 <div class="texto-intro" style="font-size:10px;margin-top:5px">
 Pressione Enter ou use + para adicionar. Você pode colocar várias tags.
 </div>
+<label>Capa</label><div id="cpBloco"></div>
 <div class="acoes-formulario">
 <button class="btn" onclick="cancelarFormulario()">
 Cancelar
@@ -2808,7 +2809,7 @@ PROJETO:"projeto"
 };
 let historias=[];
 let estadoItens={};
-let historiaEditando=null;
+let historiaEditando=null;let capaFormulario=null;let capaUniversoForm;
 let filtroAtual="Todas";
 let filtroUniversosAtual="Todos";
 let tagsAtuais=[];
@@ -3331,7 +3332,7 @@ clima:typeof dados.clima==="string"?dados.clima:"",
 cultura:typeof dados.cultura==="string"?dados.cultura:"",
 magia:typeof dados.magia==="string"?dados.magia:"",
 atributos:normalizarAtributos(dados.atributos),
-regrasLista:normalizarRegras(dados.regrasLista),
+regrasLista:normalizarRegras(dados.regrasLista),capa:(dados.capa&&typeof dados.capa==="object")?dados.capa:null,
 atualizadoEm:Number(dados.atualizadoEm)||0
 }
 }
@@ -3343,7 +3344,7 @@ clima:"",
 cultura:"",
 magia:"",
 atributos:[],
-regrasLista:[],
+regrasLista:[],capa:null,
 atualizadoEm:0
 }
 }
@@ -3351,13 +3352,13 @@ function gerarLeituraCampoUniverso(titulo,valor){
 const texto=String(valor??"").trim();
 return`<div class="detalhe-bloco"><div class="meta">${escapar(titulo)}</div><div class="descricao">${texto?escapar(texto).replace(/\n/g,"<br>"):"Nenhuma informação registrada."}</div></div>`
 }
-function editarUniversoVisualizado(){
+function editarUniversoVisualizado(){if(universoAberto!==null){const d0=obterDadosUniverso(universoAberto);capaUniversoForm=d0.capa?JSON.parse(JSON.stringify(d0.capa)):null}
 if(universoAberto===null)return;
 universoEditando=true;
 renderizarUniversoDetalhe();
 window.scrollTo({top:0,behavior:"smooth"})
 }
-function cancelarEdicaoUniverso(){
+function cancelarEdicaoUniverso(){capaUniversoForm=undefined;
 universoEditando=false;
 renderizarUniversoDetalhe()
 }
@@ -3378,7 +3379,7 @@ const campo=document.getElementById(id);
 dados[chave]=campo?campo.value:"";
 });
 dados.atualizadoEm=Date.now();
-dadosUniversos[universoAberto]=dados;
+dados.capa=capaUniversoForm===undefined?dados.capa:capaUniversoForm;capaUniversoForm=undefined;dadosUniversos[universoAberto]=dados;
 salvarDadosUniversos();
 const estado=garantirEstadoItem(
 TIPOS_ITEM.UNIVERSO,
@@ -3867,21 +3868,40 @@ descricao:(linha.querySelector("[data-regra-descricao]")||{value:""}).value.trim
 inquebravel:!!(linha.querySelector("[data-regra-inquebravel]")||{checked:false}).checked
 })).filter(regra=>regra.titulo!==""||regra.descricao!=="")
 }
+const ROTULOS_REGRA={Mundo:"mundo",Cidade:"cidade",Magia:"magia",Personagem:"personagem",Sociedade:"sociedade",Narrativa:"narrativa"};
+function rotuloTipoRegra(t){return t==="Outro"?"Outro tipo":"Regra de "+(ROTULOS_REGRA[t]||t)}
 function gerarConteudoRegras(regras,tipo,chave){
-const idLista=tipo==="historia"?"listaRegrasHistoria":"listaRegrasUniverso";
-const lista=normalizarRegras(regras);
-const alvo=tipo==="historia"?"desta história":"deste universo";
-return `<div class="detalhe-secao">
-<h2>📜 Regras</h2>
-<div class="formulario-universo">
-<div class="aviso-formulario">✦ Registre as regras ${alvo}: leis do mundo, limites da magia, costumes, ou regras de escrita que você quer manter. Cada regra tem um nome e uma explicação.</div>
-<div class="lista-regras" id="${idLista}">${lista.map(regra=>gerarLinhaRegra(regra.titulo,regra.descricao,regra.tipo,regra.inquebravel)).join("")}</div>
-<div class="acoes-atributos">
-<button type="button" class="btn" onclick="adicionarLinhaRegra('${idLista}')">＋ Adicionar regra</button>
-<button type="button" class="btn btn-principal" onclick="salvarRegras('${tipo}',${escapar(JSON.stringify(chave))})">Salvar regras</button>
-</div>
-</div>
-</div>`
+  const lista=normalizarRegras(regras),k=escapar(JSON.stringify(chave)),alvo=tipo==="historia"?"desta história":"deste universo";
+  const cards=lista.map((r,i)=>`<div class="regra-card${r.inquebravel?" inquebravel":""}"><div class="regra-card-topo"><span class="regra-tipo">${escapar(rotuloTipoRegra(r.tipo))}</span>${r.inquebravel?'<span class="regra-lacre">🔒 Inquebrável</span>':""}</div><div class="regra-card-titulo">${escapar(r.titulo||"Regra sem nome")}</div>${r.descricao?`<p class="regra-card-desc">${escapar(r.descricao).replace(/\n/g,"<br>")}</p>`:""}<div class="regra-card-acoes"><button type="button" class="btn" onclick="abrirEditorRegra('${tipo}',${k},${i})">Editar</button><button type="button" class="btn btn-perigo" onclick="removerRegra('${tipo}',${k},${i})">Excluir</button></div></div>`).join("");
+  return `<div class="detalhe-secao regras-secao"><h2>📜 Regras</h2>${lista.length?cards:`<p class="notice" style="color:var(--texto-suave)">Nenhuma regra registrada ${alvo}.</p>`}<div id="editorRegra_${tipo}"></div><div class="acoes-atributos"><button type="button" class="btn" onclick="abrirEditorRegra('${tipo}',${k},null)">＋ Nova regra</button></div></div>`
+}
+function obterListaRegras(tipo,chave){
+  if(tipo==="historia"){const h=historias.find(i=>String(i.id)===String(chave));return h?normalizarRegras(h.regrasLista):[]}
+  return normalizarRegras(obterDadosUniverso(chave).regrasLista)
+}
+function gravarRegras(tipo,chave,lista,msg){
+  if(tipo==="historia"){const h=historias.find(i=>String(i.id)===String(chave));if(!h)return;h.regrasLista=lista;h.atualizadoEm=Date.now();salvarDados();marcarComoRecente(TIPOS_ITEM.HISTORIA,h.id);mostrarToast(msg);renderizarHistoriaDetalhe();return}
+  if(chave===null||chave===undefined)return;
+  const dados=obterDadosUniverso(chave);dados.regrasLista=lista;dados.atualizadoEm=Date.now();dadosUniversos[chave]=dados;salvarDadosUniversos();
+  const estado=garantirEstadoItem(TIPOS_ITEM.UNIVERSO,chave,dados.atualizadoEm);estado.atualizadoEm=dados.atualizadoEm;salvarEstadoItens();mostrarToast(msg);renderizarUniversoDetalhe()
+}
+function abrirEditorRegra(tipo,chave,indice){
+  const box=document.getElementById("editorRegra_"+tipo);if(!box)return;
+  const r=(indice===null||indice===undefined)?null:obterListaRegras(tipo,chave)[indice];
+  box.innerHTML=`<div class="regra-editor"><div id="editorRegraLinhas_${tipo}">${gerarLinhaRegra(r?r.titulo:"",r?r.descricao:"",r?r.tipo:"Mundo",r?r.inquebravel:false)}</div><div class="acoes-atributos"><button type="button" class="btn" onclick="cancelarEditorRegra('${tipo}')">Cancelar</button><button type="button" class="btn btn-principal" onclick="confirmarEditorRegra('${tipo}',${escapar(JSON.stringify(chave))},${(indice===null||indice===undefined)?"null":indice})">Salvar regra</button></div></div>`;
+  const c=box.querySelector("[data-regra-titulo]");if(c){c.focus();box.scrollIntoView({block:"center",behavior:"smooth"})}
+}
+function cancelarEditorRegra(tipo){const b=document.getElementById("editorRegra_"+tipo);if(b)b.innerHTML=""}
+function confirmarEditorRegra(tipo,chave,indice){
+  const nova=lerRegras("editorRegraLinhas_"+tipo)[0];
+  if(!nova){mostrarToast("Escreva o nome ou a explicação da regra.");return}
+  const lista=obterListaRegras(tipo,chave);
+  if(indice===null||indice===undefined)lista.push(nova);else lista[indice]=nova;
+  gravarRegras(tipo,chave,lista,"Regra salva.")
+}
+function removerRegra(tipo,chave,indice){
+  if(!confirmarExclusao("Excluir esta regra?"))return;
+  const lista=obterListaRegras(tipo,chave);lista.splice(indice,1);gravarRegras(tipo,chave,lista,"Regra excluída.")
 }
 function salvarRegras(tipo,chave){
 if(tipo==="historia"){
@@ -4500,10 +4520,6 @@ const abas=[
 "📁Arquivos"
 ],
 [
-"regras",
-"📜 Regras"
-],
-[
 "atributos",
 "🏷️ Atributos"
 ]
@@ -4519,12 +4535,9 @@ cronologia:
 gerarConteudoCronologia(historia),
 ideias:
 gerarConteudoIdeias(historia),
-conexoes:
-gerarConteudoConexoes(historia),
+conexoes: gerarConteudoConexoes(historia)+gerarConteudoRegras(historia.regrasLista,"historia",historia.id),
 arquivos:
 gerarConteudoArquivos(historia),
-regras:
-gerarConteudoRegras(historia.regrasLista,"historia",historia.id),
 atributos:
 gerarConteudoAtributos(historia.atributos,"historia",historia.id)
 };
@@ -4536,8 +4549,8 @@ onclick="voltarParaHistorias()"
 >
 ← Histórias
 </button>
-<div class="detalhe-titulo-linha">
-<div style="flex:1">
+<div class="detalhe-titulo-linha" ${window.cpRender&&historia.capa?'style="display:flex;align-items:flex-start"':""}>
+${window.cpRender&&historia.capa?'<div style="flex:none;margin-right:12px">'+cpRender(historia.capa,72).outerHTML+'</div>':""}<div style="flex:1">
 <h1 class="detalhe-titulo">
 ${escapar(historia.titulo)}
 </h1>
@@ -7630,7 +7643,7 @@ document.getElementById(
 100
 )
 }
-function limparFormulario(){
+function limparFormulario(){capaFormulario=null;window.cpAtualizarBloco&&cpAtualizarBloco();
 document.getElementById(
 "titulo"
 ).value="";
@@ -7871,8 +7884,7 @@ estado:
 document.getElementById(
 "estado"
 ).value,
-tags:
-[...tagsAtuais],
+tags:[...tagsAtuais],capa:capaFormulario||null,
 atualizadoEm
 };
 if(historiaEditando!==null){
@@ -7951,8 +7963,7 @@ historias.find(
 item=>String(item.id)===String(id)
 );
 if(!historia)return;
-historiaEditando=
-historia.id;
+historiaEditando=historia.id;capaFormulario=historia.capa?JSON.parse(JSON.stringify(historia.capa)):null;window.cpAtualizarBloco&&cpAtualizarBloco();
 document.getElementById(
 "tituloFormulario"
 ).textContent=
@@ -8203,8 +8214,7 @@ align-items:flex-start;
 gap:10px
 "
 >
-<div style="flex:1">
-<div class="titulo-historia">
+${window.cpThumb?cpThumb(historia):""}<div style="flex:1"><div class="titulo-historia">
 ${escapar(historia.titulo)}
 </div>
 <div class="meta">
@@ -8558,7 +8568,6 @@ const abas=[
 ["cronologia","🕰️ Cronologia"],
 ["ideias","💡 Ideias"],
 ["conexoes","🔗 Conexões"],
-["regras","📜 Regras"],
 ["atributos","🏷️ Atributos"]
 ];
 area.innerHTML=`
@@ -8569,8 +8578,8 @@ onclick="voltarParaUniversos()"
 >
 ← Universos
 </button>
-<div class="detalhe-titulo-linha">
-<div style="flex:1">
+<div class="detalhe-titulo-linha" ${window.cpRender&&dados.capa?'style="display:flex;align-items:flex-start"':""}>
+${window.cpRender&&dados.capa?'<div style="flex:none;margin-right:12px">'+cpRender(dados.capa,72).outerHTML+'</div>':""}<div style="flex:1">
 <h1 class="detalhe-titulo">
 ${escapar(universo.nome)}
 </h1>
@@ -8605,6 +8614,7 @@ class="conteudo-aba-detalhe ${abaUniversoAtual==="visao-geral"?"ativa":""}"
 ✦ Este espaço pertence ao mundo. Leia as informações do universo aqui. Para alterar qualquer uma delas, use Editar.
 </div>
 ${universoEditando?`
+<label>Capa</label><div id="cpBlocoUniverso"></div>
 <label for="campoDescricaoUniverso">Descrição</label>
 <textarea id="campoDescricaoUniverso" placeholder="Como é este mundo? O que o define?">${escapar(dados.descricao)}</textarea>
 <label for="campoRegrasUniverso">Regras</label>
@@ -8692,13 +8702,9 @@ ${gerarConteudoIdeiasUniverso(chave)}
 <div
 class="conteudo-aba-detalhe ${abaUniversoAtual==="conexoes"?"ativa":""}"
 >
-${gerarConteudoConexoesUniverso(chave)}
+${gerarConteudoConexoesUniverso(chave)}${gerarConteudoRegras(dados.regrasLista,"universo",chave)}
 </div>
-<div
-class="conteudo-aba-detalhe ${abaUniversoAtual==="regras"?"ativa":""}"
->
-${gerarConteudoRegras(dados.regrasLista,"universo",chave)}
-</div>
+
 <div
 class="conteudo-aba-detalhe ${abaUniversoAtual==="atributos"?"ativa":""}"
 >
@@ -10321,9 +10327,7 @@ style="cursor:pointer"
 class="cabecalho-universo"
 >
 <div>
-<div class="icone-universo">
-☾
-</div>
+${(window.cpThumbUniverso&&cpThumbUniverso(universo))||'<div class="icone-universo">☾</div>'}
 <div class="titulo-historia">
 ${escapar(universo.nome)}
 </div>
@@ -10416,9 +10420,7 @@ style="cursor:pointer"
 class="cabecalho-universo"
 >
 <div>
-<div class="icone-universo">
-☾
-</div>
+${(window.cpThumbUniverso&&cpThumbUniverso(universo))||'<div class="icone-universo">☾</div>'}
 <div class="titulo-historia">
 ${escapar(universo.nome)}
 </div>
@@ -10737,9 +10739,7 @@ style="cursor:pointer"
 class="cabecalho-universo"
 >
 <div>
-<div class="icone-universo">
-☾
-</div>
+${(window.cpThumbUniverso&&cpThumbUniverso(universo))||'<div class="icone-universo">☾</div>'}
 <div class="titulo-historia">
 ${escapar(universo.nome)}
 </div>
@@ -14754,5 +14754,108 @@ window.addEventListener("popstate",function(){if(document.getElementById("painel
 try{metasPalavras.forEach(m=>{if(!m.estado)m.estado="ativa"})}catch(e){}
 
 </script>
+
+<style>
+#cpBloco,#cpBlocoUniverso{display:flex;gap:12px;align-items:center;margin:6px 0 14px}#cpBloco .cp-col,#cpBlocoUniverso .cp-col{display:flex;flex-direction:column;gap:8px;flex:1}#cpBloco .btn.cp-sel,#cpBlocoUniverso .btn.cp-sel{border-color:var(--rosa);color:var(--rosa)}
+#cpOverlay{position:fixed;inset:0;z-index:100000;background:#fffdfd;display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0px);color:#211d21}
+#cpOverlay.cp-on{display:flex}.cp-top{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #e8e0e5}.cp-top b{font-family:Georgia,serif;font-size:17px;font-weight:400}
+.cp-ok{background:#d96b91;color:#fff;border:0;border-radius:999px;padding:8px 20px}.cp-x{background:none;border:0;color:#766f75;padding:8px}
+.cp-scroll{overflow:auto;flex:1;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px))}.cp-bgst{background:#fcf1f5;border-radius:16px;padding:14px}
+#cpStage{position:relative;width:min(66vw,280px);aspect-ratio:2/3;container-type:inline-size;overflow:hidden;border-radius:3px;margin:auto;box-shadow:0 6px 20px rgba(0,0,0,.16);touch-action:none}
+#cpStage .cp-sel{outline:2px dashed #d96b91;outline-offset:3px}.cp-tabs{display:flex;gap:6px;margin:14px 0 10px}.cp-tab{flex:1;border:1px solid #e8e0e5;background:#fff;border-radius:999px;padding:8px 0;font-size:13px}.cp-tab.on{background:#fcf1f5;border-color:#d96b91;color:#8a3454}
+.cp-f{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;font-size:12px;color:#766f75}.cp-f input,.cp-f select,.cp-f textarea{border:1px solid #e8e0e5;border-radius:12px;padding:9px 11px;font-size:14px;background:#fff;color:#211d21}.cp-f input[type=color]{height:42px;padding:4px}
+.cp-sw{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.cp-swb{width:38px;height:38px;border-radius:50%;border:2px solid #fff;outline:1px solid #e8e0e5}
+.cp-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.cp-b{border:1px solid #e8e0e5;background:#fff;border-radius:999px;padding:8px 14px;font-size:13px;color:#211d21}.cp-b.cp-d{color:#a33}
+.cp-gl{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.cp-g{border:1px solid #e8e0e5;background:#fff;border-radius:12px;font-size:22px;padding:8px 0;color:#8a3454}.cp-n{font-size:13px;color:#766f75}
+</style>
+<div id="cpOverlay"><div class="cp-top"><button class="cp-x" id="cpCancel">Cancelar</button><b>Capa</b><button class="cp-ok" id="cpOk">Pronto</button></div>
+<div class="cp-scroll"><div class="cp-bgst"><div id="cpStage"></div></div><div class="cp-row" style="margin-top:10px;justify-content:center"><button class="cp-b" id="cpUndo">Desfazer</button></div>
+<div class="cp-tabs"><button class="cp-tab" data-t="fundo">Fundo</button><button class="cp-tab" data-t="add">Adicionar</button><button class="cp-tab" data-t="ajustar">Ajustar</button></div><div id="cpTab"></div></div></div>
+<script>
+(function(){
+const FONTES=[['Georgia,serif','Clássica'],['system-ui,sans-serif','Simples'],['cursive','Manuscrita'],["'Palatino Linotype',Palatino,serif",'Elegante'],["'Courier New',monospace",'Máquina'],["Impact,'Arial Black',sans-serif",'Impacto']];
+const SIMB='☾ ☼ ✦ ✧ ❦ ❧ ❃ ✿ ♡ ♥ ♣ ♜ ⚑ ⋈ ♄ ● ◆ ▲ ─ ═ ✂ ☆ ✉ ⌂'.split(' ');
+const PAL=[['#1f2d4a','#3a4f7a'],['#d96b91','#f2a7bf'],['#171519','#4a3b50'],['#fcf1f5','#f2cadb'],['#2f4a3a','#6f9a7d'],['#6b2c3e','#c4506b'],['#f1d9a6','#e0b46a'],['#fffdfd','#e8e0e5']];
+const $=id=>document.getElementById(id),uid=()=>'c'+Math.random().toString(36).slice(2,9);
+const bgCss=b=>{b=b||{};const c1=b.c1||'#fcf1f5';return b.m==='g'?`linear-gradient(${b.a??160}deg,${c1},${b.c2||c1})`:c1};
+function itemEl(i){const e=document.createElement('div');e.style.cssText=`position:absolute;left:${i.x}%;top:${i.y}%;transform:translate(-50%,-50%) rotate(${i.r||0}deg)${i.fl?' scaleX(-1)':''};font-size:${(i.s/3.6).toFixed(2)}cqw;color:${i.c};font-family:${i.f||'Georgia,serif'};white-space:pre;text-align:center;line-height:1.15`;e.textContent=i.v;return e}
+window.cpRender=(capa,w)=>{const d=document.createElement('div');d.style.cssText=`position:relative;width:${w}px;aspect-ratio:2/3;background:${bgCss(capa&&capa.bg)};container-type:inline-size;overflow:hidden;border-radius:3px;flex:none`;((capa&&capa.it)||[]).forEach(i=>d.appendChild(itemEl(i)));return d};
+window.cpThumb=h=>h&&h.capa?cpRender(h.capa,56).outerHTML:'';
+window.cpAtualizarBloco=function(){
+  const b=$('cpBloco');if(!b)return;b.innerHTML='';const mk=(t,f,c)=>{const x=document.createElement('button');x.className='btn'+(c?' '+c:'');x.type='button';x.textContent=t;x.onclick=f;return x};
+  const col=document.createElement('div');col.className='cp-col';
+  if(capaFormulario){b.appendChild(cpRender(capaFormulario,64));col.appendChild(mk('Editar capa',()=>cpAbrir(capaFormulario)));col.appendChild(mk('Sem capa',()=>{capaFormulario=null;cpAtualizarBloco()}))}
+  else{col.appendChild(mk('Criar uma capa',()=>cpAbrir(null)));col.appendChild(mk('Sem capa',()=>{},'cp-sel'))}
+  b.appendChild(col);
+};
+let ed=null,sel=null,undo=[],pend=null,tab='fundo';
+const snap=()=>JSON.stringify(ed),push=p=>{undo.push(p);if(undo.length>30)undo.shift()};
+const lum=h=>{const m=/^#?([0-9a-f]{6})$/i.exec(h||'');if(!m)return 1;const n=parseInt(m[1],16);return(.299*(n>>16)+.587*((n>>8)&255)+.114*(n&255))/255};
+const tinta=()=>lum(ed.bg.c1)>.6?'#211d21':'#fff6e4',cur=()=>ed.it.find(i=>i.id===sel);
+function stage(){const st=$('cpStage');st.style.background=bgCss(ed.bg);st.innerHTML='';ed.it.forEach(i=>{const e=itemEl(i);if(i.id===sel)e.classList.add('cp-sel');e.style.cursor='grab';e.onpointerdown=ev=>drag(ev,i,e);st.appendChild(e)})}
+function drag(ev,i,e){ev.preventDefault();const r=$('cpStage').getBoundingClientRect(),pre=snap(),sx=ev.clientX,sy=ev.clientY,x0=i.x,y0=i.y;let moved=false;sel=i.id;
+  const mv=m=>{const dx=(m.clientX-sx)/r.width*100,dy=(m.clientY-sy)/r.height*100;if(Math.abs(dx)+Math.abs(dy)>.8)moved=true;i.x=Math.max(0,Math.min(100,x0+dx));i.y=Math.max(0,Math.min(100,y0+dy));e.style.left=i.x+'%';e.style.top=i.y+'%'};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);if(moved)push(pre);stage();if(tab==='ajustar')paint()};addEventListener('pointermove',mv);addEventListener('pointerup',up)}
+function live(el,fn){const st=()=>{pend=pend||snap()};el.addEventListener('pointerdown',st);el.addEventListener('keydown',st);el.addEventListener('input',()=>{st();fn(el.value);stage()});el.addEventListener('change',()=>{if(pend){push(pend);pend=null}})}
+function paint(){
+  $$('.cp-tab').forEach(t=>t.classList.toggle('on',t.dataset.t===tab));const box=$('cpTab'),b=ed.bg,g=b.m==='g',it=cur();
+  if(tab==='fundo'){
+    box.innerHTML=`<div class="cp-sw">${PAL.map((p,i)=>`<button class="cp-swb" data-p="${i}" style="background:linear-gradient(160deg,${p[0]},${p[1]})"></button>`).join('')}</div><div class="cp-f"><label>Estilo</label><select id="cpM"><option value="s">Cor única</option><option value="g">Degradê</option></select></div><div class="cp-f"><label>Cor</label><input type="color" id="cpC1"></div><div class="cp-f" style="display:${g?'flex':'none'}"><label>Segunda cor</label><input type="color" id="cpC2"></div><div class="cp-f" style="display:${g?'flex':'none'}"><label>Direção</label><input type="range" id="cpA" min="0" max="360"></div>`;
+    $('cpM').value=g?'g':'s';$('cpC1').value=b.c1||'#fcf1f5';$('cpC2').value=b.c2||b.c1||'#fcf1f5';$('cpA').value=b.a??160;
+    $$('.cp-swb').forEach(x=>x.onclick=()=>{push(snap());const p=PAL[x.dataset.p];ed.bg={m:'g',c1:p[0],c2:p[1],a:160};stage();paint()});
+    $('cpM').onchange=e=>{push(snap());ed.bg.m=e.target.value;if(!ed.bg.c2)ed.bg.c2=ed.bg.c1;stage();paint()};
+    live($('cpC1'),v=>ed.bg.c1=v);live($('cpC2'),v=>ed.bg.c2=v);live($('cpA'),v=>ed.bg.a=+v);
+  }else if(tab==='add'){
+    box.innerHTML=`<div class="cp-f"><label>Texto</label><input id="cpTxt" placeholder="Título da história"></div><div class="cp-row"><button class="cp-b" id="cpT">Adicionar título</button><button class="cp-b" id="cpS">Adicionar subtítulo</button></div><div class="cp-f"><label>Símbolos</label></div><div class="cp-gl">${SIMB.map(s=>`<button class="cp-g" data-s="${s}">${s}</button>`).join('')}</div>`;
+    const t0=$('titulo');$('cpTxt').value=nomePad||(t0?t0.value:'');
+    const add=(v,s,f,y)=>{if(!v)return;push(snap());const i={id:uid(),v,x:50,y,s,c:tinta(),f,r:0,fl:0};ed.it.push(i);sel=i.id;stage()};
+    $('cpT').onclick=()=>add($('cpTxt').value.trim(),38,'Georgia,serif',62);$('cpS').onclick=()=>add($('cpTxt').value.trim(),18,'system-ui,sans-serif',74);
+    $$('.cp-g').forEach(x=>x.onclick=()=>add(x.dataset.s,64,'Georgia,serif',24+(ed.it.length*9)%34));
+  }else{
+    if(!it){box.innerHTML='<p class="cp-n">Toque num elemento da capa para ajustá-lo.</p>';return}
+    box.innerHTML=`<div class="cp-f"><label>Texto</label><textarea id="cpV" rows="2"></textarea></div><div class="cp-f"><label>Tamanho</label><input type="range" id="cpSz" min="10" max="220"></div><div class="cp-f"><label>Giro</label><input type="range" id="cpR" min="-180" max="180"></div><div class="cp-f"><label>Cor</label><input type="color" id="cpCo"></div><div class="cp-f"><label>Estilo da letra</label><select id="cpF">${FONTES.map(f=>`<option value="${f[0].replace(/"/g,'&quot;')}">${f[1]}</option>`).join('')}</select></div><div class="cp-row"><button class="cp-b" id="cpFl">Espelhar</button><button class="cp-b" id="cpDu">Duplicar</button><button class="cp-b" id="cpFr">Trazer à frente</button><button class="cp-b cp-d" id="cpRm">Remover</button></div>`;
+    $('cpV').value=it.v;$('cpSz').value=it.s;$('cpR').value=it.r||0;$('cpCo').value=/^#[0-9a-f]{6}$/i.test(it.c)?it.c:'#ffffff';$('cpF').value=it.f;
+    live($('cpV'),v=>it.v=v);live($('cpSz'),v=>it.s=+v);live($('cpR'),v=>it.r=+v);live($('cpCo'),v=>it.c=v);
+    $('cpF').onchange=e=>{push(snap());it.f=e.target.value;stage()};
+    $('cpFl').onclick=()=>{push(snap());it.fl=it.fl?0:1;stage()};
+    $('cpDu').onclick=()=>{push(snap());const n={...it,id:uid(),x:Math.min(100,it.x+6),y:Math.min(100,it.y+6)};ed.it.push(n);sel=n.id;stage();paint()};
+    $('cpFr').onclick=()=>{push(snap());ed.it=ed.it.filter(i=>i!==it).concat(it);stage()};
+    $('cpRm').onclick=()=>{push(snap());ed.it=ed.it.filter(i=>i!==it);sel=null;stage();paint()};
+  }
+}
+function $$(q){return[...document.querySelectorAll(q)]}
+let onOk=null,nomePad='';window.cpAbrir=function(capa,ok,nome){onOk=ok||null;nomePad=nome||'';ed=capa?JSON.parse(JSON.stringify(capa)):{v:1,bg:{m:'s',c1:'#fcf1f5'},it:[]};sel=null;undo=[];pend=null;tab='fundo';$('cpOverlay').classList.add('cp-on');stage();paint()};
+const fechar=()=>$('cpOverlay').classList.remove('cp-on');
+$('cpCancel').onclick=fechar;$('cpOk').onclick=()=>{fechar();if(onOk)onOk(ed);else{capaFormulario=ed;cpAtualizarBloco()}};
+$('cpUndo').onclick=()=>{const p=undo.pop();if(!p)return;ed=JSON.parse(p);if(!cur())sel=null;stage();paint()};
+$$('.cp-tab').forEach(t=>t.onclick=()=>{tab=t.dataset.t;paint()});
+window.cpAtualizarBlocoUniverso=function(){
+  const b=$('cpBlocoUniverso');if(!b)return;b.innerHTML='';
+  const mk=(t,f,c)=>{const x=document.createElement('button');x.className='btn'+(c?' '+c:'');x.type='button';x.textContent=t;x.onclick=f;return x};
+  const nome=()=>{try{return obterMapaUniversos()[universoAberto].nome}catch(e){return''}};
+  const abrir=c=>cpAbrir(c,e=>{capaUniversoForm=e;cpAtualizarBlocoUniverso()},nome());
+  const col=document.createElement('div');col.className='cp-col';
+  if(capaUniversoForm){b.appendChild(cpRender(capaUniversoForm,64));col.appendChild(mk('Editar capa',()=>abrir(capaUniversoForm)));col.appendChild(mk('Sem capa',()=>{capaUniversoForm=null;cpAtualizarBlocoUniverso()}))}
+  else{col.appendChild(mk('Criar uma capa',()=>abrir(null)));col.appendChild(mk('Sem capa',()=>{},'cp-sel'))}
+  b.appendChild(col);
+};
+window.cpThumbUniverso=u=>{try{const c=obterDadosUniverso(obterChaveUniverso(u.nome)).capa;return c?`<div style="margin-bottom:8px">${cpRender(c,56).outerHTML}</div>`:''}catch(e){return''}};
+const _rud=window.renderizarUniversoDetalhe;window.renderizarUniversoDetalhe=function(){const r=_rud.apply(this,arguments);cpAtualizarBlocoUniverso();return r};
+cpAtualizarBloco();
+})();
+</script>
+<style>
+.regra-card{border:1px solid var(--linha);border-radius:16px;padding:14px;margin-bottom:10px;background:#fff}
+.regra-card.inquebravel{border-color:var(--rosa);background:var(--rosa-claro)}
+.regra-card-topo{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+.regra-tipo{font-size:12px;color:#8a3454;background:var(--rosa-claro);border:1px solid var(--linha);border-radius:999px;padding:2px 10px}
+.regra-lacre{font-size:12px;color:var(--rosa);font-weight:600}
+.regra-card-titulo{font-family:Georgia,serif;font-size:17px;margin-bottom:4px}
+.regra-card-desc{margin:0 0 10px;color:var(--texto-suave);line-height:1.5;font-size:14px}
+.regra-card-acoes{display:flex;gap:8px}
+.regra-editor{border:1px dashed var(--rosa);border-radius:16px;padding:12px;margin:10px 0}
+.regra-editor .btn-remover-atributo{display:none}
+.regras-secao{margin-top:22px}
+</style>
 </body>
 </html>
