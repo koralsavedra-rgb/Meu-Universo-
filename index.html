@@ -1738,6 +1738,31 @@ body.sem-dicas .texto-intro,body.sem-dicas .aviso-formulario{display:none!import
 .ritmo-barra-palavras>span{display:block;height:100%;border-radius:99px;background:var(--rosa, #d98aa5);width:0}
 .ritmo-concluido-palavras{margin:8px 0 0;font-size:.92em}
 .ritmo-lista-palavras{font-size:.84em;margin-top:8px;color:var(--texto-secundario, var(--texto, inherit));opacity:.85}
+
+/* Ordem de trabalho — extensão isolada */
+.card-ordem-trabalho{display:block;width:100%;min-width:0;text-align:center;cursor:pointer;border:1px solid var(--linha);background:#fff;border-radius:16px;padding:12px 8px;color:var(--texto)}
+.card-ordem-trabalho strong{display:block;font-family:Georgia,serif;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+.card-ordem-trabalho span{display:block;color:var(--texto-suave);font-size:10px;margin-top:4px}
+.ordem-acoes{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.ordem-acoes .btn{flex:1;min-width:120px}
+.ordem-item{display:flex;align-items:center;gap:10px;padding:13px;border:1px solid var(--linha);border-radius:16px;background:white;margin-bottom:8px}
+.ordem-item-conteudo{flex:1;min-width:0;cursor:pointer}
+.ordem-numero{font-size:10px;color:var(--rosa);font-weight:750;letter-spacing:.5px;margin-bottom:4px}
+.ordem-titulo{font-family:Georgia,serif;font-size:17px;line-height:1.3;overflow-wrap:anywhere}
+.ordem-controles{display:flex;flex-direction:column;gap:4px}
+.ordem-controles .btn{padding:6px 9px;min-width:37px}
+.ordem-sugestao{background:var(--rosa-claro);border:1px solid #f0d8e2;border-radius:14px;padding:12px;margin-top:10px;font-size:12px;line-height:1.5}
+.ordem-vazio{padding:24px 15px;text-align:center}
+.ordem-vazio h3{font-family:Georgia,serif;margin:7px 0}
+.ordem-vazio p{font-size:12px;color:var(--texto-suave);line-height:1.5}
+.ordem-modal-fundo{position:fixed;inset:0;z-index:100;background:rgba(20,15,20,.58);display:flex;align-items:center;justify-content:center;padding:16px}
+.ordem-modal{background:var(--fundo);border:1px solid var(--linha);border-radius:20px;width:min(560px,100%);max-height:90vh;overflow:auto;padding:18px}
+.ordem-modal h2{margin-top:0}
+.ordem-check{display:flex;align-items:flex-start;gap:9px;padding:10px;border:1px solid var(--linha);border-radius:12px;margin:7px 0;font-size:12px;line-height:1.45}
+.ordem-check input{width:18px;min-width:18px;margin:1px 0 0;accent-color:var(--rosa)}
+.ordem-modal-acoes{display:flex;gap:8px;margin-top:14px}
+.ordem-modal-acoes .btn{flex:1}
+@media(max-width:420px){.ordem-item{align-items:flex-start;padding:11px}.ordem-titulo{font-size:15px}.card-ordem-trabalho strong{font-size:13px}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
@@ -1945,6 +1970,9 @@ id="numeroUniversos">0</strong><span>Universos</span></div>
 </button>
 <button class="estatistica" onclick="mostrarTela('jornadas')" style="text-align:center;cursor:pointer">
 <strong id="numeroXPGeral">0</strong><span id="labelNivelGeral">Nível 1</span>
+</button>
+<button id="cardOrdemTrabalhoInicio" class="card-ordem-trabalho" onclick="mostrarTela('ordemTrabalho')" aria-label="Abrir ordem de trabalho">
+<strong id="ordemInicioNumero">História nº 1</strong><span id="ordemInicioTitulo">Organizar sua escrita</span>
 </button>
 </div>
 <div id="conteudoInicio"></div>
@@ -2556,6 +2584,8 @@ onclick="novoProjeto()"
 <button class="btn btn-voltar" type="button" onclick="mostrarTela('metasPalavras')">← Metas de palavras</button>
 <div id="conteudoDetalheMetaPalavras"></div>
 </section>
+<section id="ordemTrabalho" class="tela"><div id="conteudoOrdemTrabalho"></div></section>
+<section id="todasOrdemTrabalho" class="tela"><div id="conteudoTodasOrdemTrabalho"></div></section>
 
 </main>
 <button id="botaoFlutuante" class="fab" aria-label="Criar história">
@@ -2809,6 +2839,9 @@ PROJETO:"projeto"
 };
 let historias=[];
 let estadoItens={};
+const CHAVE_ORDEM_TRABALHO="meu_universo_ordem_trabalho_0_1";
+let ordemTrabalho={ids:[],concluidas:[],desbloqueios:0,dia:"individual",primeiraDesbloqueada:false};
+let ordemTrabalhoRascunho=[];
 let historiaEditando=null;let capaFormulario=null;let capaUniversoForm;
 let filtroAtual="Todas";
 let filtroUniversosAtual="Todos";
@@ -4142,6 +4175,8 @@ b.dataset.tela===id
 );
 if(id==="inicio")
 renderizarInicio();
+if(id==="ordemTrabalho")renderizarOrdemTrabalho();
+if(id==="todasOrdemTrabalho")renderizarTodasHistoriasOrdem();
 if(id==="configuracoes")
 renderizarPreferenciasConfiguracoes();
 if(id==="historias")
@@ -7963,15 +7998,13 @@ atualizadoEm
 salvarEstadoItens()
 }
 salvarDados();
+const criadaNaOrdem=window.origemNovaHistoriaOrdem===true&&historiaEditando===null;
 historiaEditando=null;
 limparFormulario();
 renderizarTudo();
-mostrarTela(
-"historias"
-);
-mostrarToast(
-"História salva."
-)
+if(criadaNaOrdem){const criada=historias[0];if(criada&&!ordemTrabalho.ids.some(id=>String(id)===String(criada.id))&&!ordemTrabalho.concluidas.some(id=>String(id)===String(criada.id))){if(ordemTrabalho.primeiraDesbloqueada)ordemTrabalho.ids.unshift(criada.id);else ordemTrabalho.ids.push(criada.id);ordemTrabalho.primeiraDesbloqueada=false;salvarOrdemTrabalho()}window.origemNovaHistoriaOrdem=false}
+mostrarTela(criadaNaOrdem?"ordemTrabalho":"historias");
+mostrarToast("História salva.")
 }
 function editarHistoria(id){
 const historia=
@@ -8056,11 +8089,11 @@ id
 )
 }
 function cancelarFormulario(){
+const cancelarDaOrdem=window.origemNovaHistoriaOrdem===true;
+window.origemNovaHistoriaOrdem=false;
 historiaEditando=null;
 limparFormulario();
-mostrarTela(
-"historias"
-)
+mostrarTela(cancelarDaOrdem?"ordemTrabalho":"historias")
 }
 function excluirHistoria(id){
 const historia=
@@ -8528,7 +8561,8 @@ const{nivel,xpNoNivel}=calcularNivelXP();
 const numeroXPEl=document.getElementById("numeroXPGeral");
 const labelNivelEl=document.getElementById("labelNivelGeral");
 if(numeroXPEl)numeroXPEl.textContent=xpGeral;
-if(labelNivelEl)labelNivelEl.textContent=`Nível ${nivel}`
+if(labelNivelEl)labelNivelEl.textContent=`Nível ${nivel}`;
+renderizarCartaoOrdemInicio()
 }
 function abrirUniverso(chave){
 const mapa=obterMapaUniversos();
@@ -14214,6 +14248,58 @@ async function mostrarResultadoTraducao(textoOriginal,textoTraduzido){const resu
 async function traduzirTrechoPDF(){const campo=document.getElementById("campoTrechoPDF");const texto=campo?.value.trim()||"";if(!texto){alert("Digite ou cole um trecho curto para traduzir.");return}try{mostrarToast("Traduzindo trecho...");const t=await traduzirTextoComServico(texto);pdfTextoTraducao=t;pdfModoTraducao="ambos";await mostrarResultadoTraducao(texto,t)}catch(erro){console.error(erro);alert("Não foi possível traduzir agora. Verifique sua conexão com a internet e tente novamente.")}}
 async function traduzirPaginaPDF(){const texto=pdfTextoPaginaAtual.trim();if(!texto){alert("Não foi possível extrair o texto desta página. Você pode copiar o texto do PDF e usar a opção de trecho/linha.");return}try{mostrarToast("Traduzindo página...");const t=await traduzirTextoComServico(texto);pdfTextoTraducao=t;pdfModoTraducao="ambos";const campo=document.getElementById("campoTrechoPDF");if(campo)campo.value=texto;await mostrarResultadoTraducao(texto,t)}catch(erro){console.error(erro);alert("Não foi possível traduzir a página agora. Verifique sua conexão com a internet.")}}
 function atualizarModoTraducaoVisual(){if(pdfModoTraducao==="original")return;if(pdfTextoTraducao)mostrarResultadoTraducao(pdfTextoPaginaAtual,pdfTextoTraducao)}
+/* ============ ORDEM DE TRABALHO ============ */
+function carregarOrdemTrabalho(){
+ try{const bruto=localStorage.getItem(CHAVE_ORDEM_TRABALHO);if(bruto){const salvo=JSON.parse(bruto);if(salvo&&typeof salvo==="object")ordemTrabalho={...ordemTrabalho,...salvo}}}catch(e){console.warn("Não foi possível carregar a ordem de trabalho:",e)}
+ if(!Array.isArray(ordemTrabalho.ids))ordemTrabalho.ids=[];
+ if(!Array.isArray(ordemTrabalho.concluidas))ordemTrabalho.concluidas=[];
+ ordemTrabalho.ids=ordemTrabalho.ids.filter((id,i,arr)=>historias.some(h=>String(h.id)===String(id))&&!ehArquivado(TIPOS_ITEM.HISTORIA,id)&&arr.findIndex(x=>String(x)===String(id))===i);
+ ordemTrabalho.concluidas=ordemTrabalho.concluidas.filter((id,i,arr)=>historias.some(h=>String(h.id)===String(id))&&arr.findIndex(x=>String(x)===String(id))===i);
+ sincronizarConcluidasOrdem();
+ salvarOrdemTrabalho();
+}
+function sincronizarConcluidasOrdem(){historias.forEach(h=>{const concluida=String(h.estado||"").toLowerCase()==="concluída";const id=String(h.id);if(concluida){ordemTrabalho.ids=ordemTrabalho.ids.filter(x=>String(x)!==id);if(!ordemTrabalho.concluidas.some(x=>String(x)===id))ordemTrabalho.concluidas.push(h.id)}else{ordemTrabalho.concluidas=ordemTrabalho.concluidas.filter(x=>String(x)!==id)}})}
+function salvarOrdemTrabalho(){try{localStorage.setItem(CHAVE_ORDEM_TRABALHO,JSON.stringify(ordemTrabalho))}catch(e){console.error("Erro ao salvar ordem de trabalho:",e);mostrarToast("Não foi possível salvar a ordem neste navegador.")}}
+function historiaPorIdOrdem(id){return historias.find(h=>String(h.id)===String(id))}
+function historiasDisponiveisOrdem(){return historias.filter(h=>!ehArquivado(TIPOS_ITEM.HISTORIA,h.id)&&!ordemTrabalho.ids.some(id=>String(id)===String(h.id))&&!ordemTrabalho.concluidas.some(id=>String(id)===String(h.id)))}
+function renderizarCartaoOrdemInicio(){const historia=ordemTrabalho.ids.length?historiaPorIdOrdem(ordemTrabalho.ids[0]):null;const numero=document.getElementById("ordemInicioNumero"),titulo=document.getElementById("ordemInicioTitulo");if(numero)numero.textContent=historia?"História nº 1":"História nº 1";if(titulo)titulo.textContent=historia?(historia.titulo||"Sem título"):(ordemTrabalho.primeiraDesbloqueada?"Escolher história":"Começar ordem de trabalho");const card=document.getElementById("cardOrdemTrabalhoInicio");if(card)card.setAttribute("aria-label",historia?`História número 1: ${historia.titulo}`:"Abrir ordem de trabalho")}
+function textoSugestaoOrdem(posicao){const compartilhado=ordemTrabalho.dia==="compartilhado";const valores=compartilhado?{1:[750,"1h15"],2:[350,"30 min"],3:[200,"20 min"]}:{1:[1500,"2h30"],2:[500,"45 min"],3:[300,"30 min"]};const v=valores[posicao];if(!v)return"";return `Sugestão ${compartilhado?"para um dia compartilhado":"para um dia individual"}: ${v[0].toLocaleString("pt-BR")} palavras · ${v[1]}. É apenas uma orientação, não uma obrigação.`}
+function renderizarOrdemTrabalho(){
+ renderizarCartaoOrdemInicio();const raiz=document.getElementById("conteudoOrdemTrabalho");if(!raiz)return;
+ const ids=ordemTrabalho.ids;const slotVazio=ordemTrabalho.primeiraDesbloqueada;
+ const cards=ids.map((id,i)=>{const h=historiaPorIdOrdem(id);if(!h)return"";const pos=i+(slotVazio?2:1);return `<article class="ordem-item"><div class="ordem-item-conteudo" role="button" tabindex="0" onclick="abrirHistoria(${JSON.stringify(h.id)})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirHistoria(${JSON.stringify(h.id)})}"><div class="ordem-numero">HISTÓRIA Nº ${pos}${pos===1?' · POSIÇÃO PROTEGIDA':''}</div><div class="ordem-titulo">${escapar(h.titulo||"Sem título")}</div><div class="meta">${escapar(h.estado||"Em desenvolvimento")}</div></div><div class="ordem-controles">${pos===1?`<button class="btn" title="Desbloquear posição principal" aria-label="Desbloquear posição principal" onclick="abrirModalDesbloqueioOrdem(event)">🔒</button>`:`<button class="btn" title="Mover para cima" aria-label="Mover ${escapar(h.titulo)} para cima" onclick="moverHistoriaOrdem(${i},-1)">↑</button><button class="btn" title="Mover para baixo" aria-label="Mover ${escapar(h.titulo)} para baixo" onclick="moverHistoriaOrdem(${i},1)">↓</button>`}</div></article>${pos<=3?`<div class="ordem-sugestao"><strong>Sugestão para a história nº ${pos}</strong><br>${textoSugestaoOrdem(pos)}</div>`:""}`}).join("");
+ raiz.innerHTML=`<button class="btn btn-voltar" onclick="mostrarTela('inicio')">← Início</button><div class="titulo-pagina">Ordem de trabalho</div><p class="texto-intro">Escolha em qual história concentrar sua escrita. A ordem não apaga nem altera o conteúdo das suas histórias.</p><div class="ordem-acoes"><button class="btn btn-principal" onclick="abrirAdicionarHistoriaOrdem()">＋ Adicionar história</button><button class="btn" onclick="abrirTodasHistoriasOrdem()">Todas as histórias</button></div>
+ ${slotVazio?`<article class="ordem-item"><div class="ordem-item-conteudo"><div class="ordem-numero">HISTÓRIA Nº 1 · POSIÇÃO VAZIA</div><div class="ordem-titulo">Escolha uma história</div><div class="meta">A história anterior foi movida para o fim da fila.</div></div><div class="ordem-controles"><button class="btn btn-principal" onclick="abrirAdicionarHistoriaOrdem()">＋</button></div></article>`:""}
+ ${!ids.length&&!slotVazio?`<div class="card ordem-vazio"><h3>Sua ordem de trabalho começa aqui</h3><p>Adicione uma história existente ou crie uma nova para começar sua lista.</p><button class="btn btn-principal" onclick="abrirAdicionarHistoriaOrdem()">Adicionar história</button></div>`:""}${cards}
+ ${(ids.length||slotVazio)?`<div class="card" style="margin-top:14px"><strong>Como distribuir seu dia</strong><p class="texto-intro">As sugestões de palavras e tempo são flexíveis. Escolha se cada história terá um dia próprio ou se as três primeiras dividirão o mesmo dia.</p><label for="modoDiaOrdem">Organização do dia</label><select id="modoDiaOrdem" onchange="alterarModoDiaOrdem(this.value)"><option value="individual" ${ordemTrabalho.dia!=="compartilhado"?"selected":""}>Dia individual para cada história</option><option value="compartilhado" ${ordemTrabalho.dia==="compartilhado"?"selected":""}>Dia compartilhado entre as três</option></select></div>`:""}`;
+}
+function abrirAdicionarHistoriaOrdem(){const disponiveis=historiasDisponiveisOrdem();const modal=document.createElement("div");modal.className="ordem-modal-fundo";modal.id="modalAdicionarHistoriaOrdem";modal.innerHTML=`<section class="ordem-modal" role="dialog" aria-modal="true" aria-labelledby="tituloAdicionarOrdem"><h2 id="tituloAdicionarOrdem">Adicionar história</h2><p class="texto-intro">Escolha uma história que já existe ou crie uma nova.</p>${disponiveis.length?`<label for="selecionarHistoriaOrdem">História existente</label><select id="selecionarHistoriaOrdem"><option value="">Escolha uma história</option>${disponiveis.map(h=>`<option value="${escapar(h.id)}">${escapar(h.titulo||"Sem título")}</option>`).join("")}</select><button class="btn btn-principal" style="width:100%;margin-top:10px" onclick="adicionarHistoriaExistenteOrdem()">Adicionar existente</button>`:`<p class="aviso-formulario">Não há outras histórias disponíveis para adicionar no momento.</p>`}<div class="ordem-modal-acoes"><button class="btn" onclick="fecharModalOrdem('modalAdicionarHistoriaOrdem')">Cancelar</button><button class="btn btn-principal" onclick="fecharModalOrdem('modalAdicionarHistoriaOrdem');novaHistoriaOrdem()">＋ Nova história</button></div></section>`;document.body.appendChild(modal);modal.addEventListener("click",e=>{if(e.target===modal)fecharModalOrdem(modal.id)})}
+function fecharModalOrdem(id){document.getElementById(id)?.remove()}
+function adicionarHistoriaExistenteOrdem(){const campo=document.getElementById("selecionarHistoriaOrdem");const id=campo?.value;if(!id){mostrarToast("Escolha uma história existente.");return}if(ordemTrabalho.ids.some(x=>String(x)===String(id))||ordemTrabalho.concluidas.some(x=>String(x)===String(id))){mostrarToast("Essa história já está na lista.");return}if(ordemTrabalho.primeiraDesbloqueada)ordemTrabalho.ids.unshift(id);else ordemTrabalho.ids.push(id);ordemTrabalho.primeiraDesbloqueada=false;salvarOrdemTrabalho();fecharModalOrdem("modalAdicionarHistoriaOrdem");renderizarOrdemTrabalho();mostrarToast("História adicionada à ordem de trabalho.")}
+function novaHistoriaOrdem(){historiaEditando=null;limparFormulario();document.getElementById("tituloFormulario").textContent="Criar uma história";mostrarTela("novaHistoria");setTimeout(()=>document.getElementById("titulo")?.focus(),100);window.origemNovaHistoriaOrdem=true}
+function moverHistoriaOrdem(indice,delta){const destino=indice+delta;if(indice<0||destino<0||destino>=ordemTrabalho.ids.length)return;const temp=ordemTrabalho.ids[indice];ordemTrabalho.ids[indice]=ordemTrabalho.ids[destino];ordemTrabalho.ids[destino]=temp;salvarOrdemTrabalho();renderizarOrdemTrabalho()}
+function abrirTodasHistoriasOrdem(){ordemTrabalhoRascunho=[...ordemTrabalho.ids];renderizarTodasHistoriasOrdem();mostrarTela("todasOrdemTrabalho")}
+function renderizarTodasHistoriasOrdem(){sincronizarConcluidasOrdem();salvarOrdemTrabalho();const raiz=document.getElementById("conteudoTodasOrdemTrabalho");if(!raiz)return;const concluidas=historias.filter(h=>ordemTrabalho.concluidas.some(id=>String(id)===String(h.id))||String(h.estado||"").toLowerCase()==="concluída");const ativas=ordemTrabalhoRascunho.map(id=>historiaPorIdOrdem(id)).filter(h=>h&&!ordemTrabalho.concluidas.some(id=>String(id)===String(h.id))&&String(h.estado||"").toLowerCase()!=="concluída");raiz.innerHTML=`<button class="btn btn-voltar" onclick="cancelarEdicaoOrdemTrabalho()">← Ordem de trabalho</button><div class="titulo-pagina">Todas as histórias</div><p class="texto-intro">Organize a fila e salve quando estiver satisfeita. A primeira posição permanece protegida; para alterá-la, use o desbloqueio na tela anterior.</p><div class="card"><strong>Conquistas de conclusão</strong><p class="texto-intro">${concluidas.length?`Você tem ${concluidas.length} ${concluidas.length===1?"história concluída":"histórias concluídas"}.`:"Suas histórias concluídas aparecerão nesta área."}</p></div><h2>Ordem de trabalho</h2>${ordemTrabalho.primeiraDesbloqueada?`<article class="ordem-item"><div class="ordem-item-conteudo"><div class="ordem-numero">HISTÓRIA Nº 1 · POSIÇÃO VAZIA</div><div class="ordem-titulo">Escolha uma história</div></div></article>`:""}${ativas.length?ativas.map((h,i)=>`<article class="ordem-item"><div class="ordem-item-conteudo" role="button" tabindex="0" onclick="abrirHistoria(${JSON.stringify(h.id)})"><div class="ordem-numero">HISTÓRIA Nº ${i+(ordemTrabalho.primeiraDesbloqueada?2:1)}${i===0&&!ordemTrabalho.primeiraDesbloqueada?' · PROTEGIDA':''}</div><div class="ordem-titulo">${escapar(h.titulo||"Sem título")}</div></div><div class="ordem-controles">${i===0&&!ordemTrabalho.primeiraDesbloqueada?'<span class="meta">Bloqueada</span>':`<button class="btn" onclick="moverRascunhoOrdem(${i},-1)" aria-label="Mover para cima">↑</button><button class="btn" onclick="moverRascunhoOrdem(${i},1)" aria-label="Mover para baixo">↓</button>`}</div></article>`).join(""):`<div class="card ordem-vazio"><h3>Nenhuma história na fila</h3><p>Adicione histórias pela tela Ordem de trabalho.</p></div>`}<div class="ordem-acoes"><button class="btn" onclick="cancelarEdicaoOrdemTrabalho()">Cancelar</button><button class="btn btn-principal" onclick="salvarRascunhoOrdemTrabalho()">Salvar ordem</button></div><h2>Concluídas</h2>${concluidas.length?concluidas.map(h=>`<article class="ordem-item"><div class="ordem-item-conteudo" role="button" tabindex="0" onclick="abrirHistoria(${JSON.stringify(h.id)})"><div class="ordem-titulo">${escapar(h.titulo||"Sem título")}</div><div class="meta">Concluída</div></div></article>`).join(""):`<div class="card ordem-vazio"><p>Nenhuma história concluída foi registrada aqui ainda.</p></div>`}`}
+function moverRascunhoOrdem(indice,delta){if(indice<0)return;if(indice===0&&!ordemTrabalho.primeiraDesbloqueada&&delta<0)return;const destino=indice+delta;if(destino<0||destino>=ordemTrabalhoRascunho.length||(!ordemTrabalho.primeiraDesbloqueada&&destino===0))return;const t=ordemTrabalhoRascunho[indice];ordemTrabalhoRascunho[indice]=ordemTrabalhoRascunho[destino];ordemTrabalhoRascunho[destino]=t;renderizarTodasHistoriasOrdem()}
+function salvarRascunhoOrdemTrabalho(){if(!ordemTrabalho.primeiraDesbloqueada&&ordemTrabalho.ids.length&&ordemTrabalhoRascunho.length&&String(ordemTrabalho.ids[0])!==String(ordemTrabalhoRascunho[0])){mostrarToast("A primeira posição é protegida. Use o desbloqueio na tela Ordem de trabalho.");return}ordemTrabalho.ids=[...ordemTrabalhoRascunho];salvarOrdemTrabalho();renderizarOrdemTrabalho();mostrarTela("ordemTrabalho");mostrarToast("Ordem salva.")}
+function cancelarEdicaoOrdemTrabalho(){ordemTrabalhoRascunho=[];mostrarTela("ordemTrabalho")}
+function alterarModoDiaOrdem(valor){ordemTrabalho.dia=valor==="compartilhado"?"compartilhado":"individual";salvarOrdemTrabalho();renderizarOrdemTrabalho()}
+const AVISOS_DESBLOQUEIO_ORDEM=[
+`Oi, docinho, por que você quer mudar de história, hein? Não tem nada de melhor para fazer, não?\n\nVenha comigo, analise comigo e marque as opções. E, se não marcar tudo, então você é uma idiota, tá legal, futura eu?`,
+`Oi, você tem um problema, mas ainda estamos na segunda vez. Então, as opções estão abaixo. Aperte com sabedoria.`,
+`Ahhh, qual é? Tu não tá bem, não. Um conselho: antes de continuar, tente se resolver. Sério, tem algo de errado. Não dá para continuar assim, minha filha. Respire e pense de verdade.`
+];
+const OPCOES_DESBLOQUEIO_ORDEM=[
+"Considerei a possibilidade de ser algo que possa ser corrigido, como o tempo que passei com essa história, que pode tê-la tornado entediante ou complicada.",
+"Tentei tirar um tempo para realmente pensar se não estou parando essa história apenas porque travei em alguma parte. Tentei meditar e abrir minha mente para novas possibilidades, mas nada resolveu.",
+"Conversei sobre essa decisão com alguém e percebi que realmente precisava parar essa história e me concentrar em outra.",
+"Fiz uma pausa e, mesmo assim, cheguei ao mesmo resultado: não quero mais continuar com essa história.",
+"Pensei bem sobre isso."
+];
+function abrirModalDesbloqueioOrdem(event){event?.stopPropagation();if(!ordemTrabalho.ids.length)return;const numero=Math.min(Number(ordemTrabalho.desbloqueios)||0,2);const modal=document.createElement("div");modal.className="ordem-modal-fundo";modal.id="modalDesbloqueioOrdem";modal.innerHTML=`<section class="ordem-modal" role="dialog" aria-modal="true" aria-labelledby="tituloDesbloqueioOrdem"><h2 id="tituloDesbloqueioOrdem">Antes de mudar de história...</h2><p style="white-space:pre-line;line-height:1.55;font-size:13px">${escapar(AVISOS_DESBLOQUEIO_ORDEM[numero])}</p>${OPCOES_DESBLOQUEIO_ORDEM.map((t,i)=>`<label class="ordem-check"><input type="checkbox" class="checkDesbloqueioOrdem" onchange="validarConfirmacaoDesbloqueioOrdem()"><span>${escapar(t)}</span></label>`).join("")}<p style="font-weight:750;margin-top:15px">Desbloquear? Certeza absoluta?</p><div class="ordem-modal-acoes"><button class="btn" onclick="fecharModalOrdem('modalDesbloqueioOrdem')">Cancelar</button><button id="confirmarDesbloqueioOrdem" class="btn btn-principal" disabled onclick="confirmarDesbloqueioOrdem()">Confirmar</button></div></section>`;document.body.appendChild(modal);modal.addEventListener("click",e=>{if(e.target===modal)fecharModalOrdem(modal.id)})}
+function validarConfirmacaoDesbloqueioOrdem(){const checks=[...document.querySelectorAll("#modalDesbloqueioOrdem .checkDesbloqueioOrdem")];const botao=document.getElementById("confirmarDesbloqueioOrdem");if(botao)botao.disabled=!checks.length||!checks.every(c=>c.checked)}
+function confirmarDesbloqueioOrdem(){const checks=[...document.querySelectorAll("#modalDesbloqueioOrdem .checkDesbloqueioOrdem")];if(checks.length!==5||!checks.every(c=>c.checked))return;const antigo=ordemTrabalho.ids.shift();if(antigo!==undefined)ordemTrabalho.ids.push(antigo);ordemTrabalho.primeiraDesbloqueada=true;ordemTrabalho.desbloqueios=(Number(ordemTrabalho.desbloqueios)||0)+1;salvarOrdemTrabalho();fecharModalOrdem("modalDesbloqueioOrdem");renderizarOrdemTrabalho();mostrarToast("A posição principal está vazia. A história anterior foi para o fim da fila.")}
+
 function renderizarTudo(){
 renderizarInicio();
 renderizarHistorias();
@@ -14591,6 +14677,7 @@ carregarProjetos();
 carregarLixeiraHistorias();
 carregarDiario();
 carregarDados();
+carregarOrdemTrabalho();
 carregarPreferencias();
 renderizarTudo();
 setInterval(function(){
